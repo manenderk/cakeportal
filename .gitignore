@@ -1,10 +1,17 @@
 # CakePHP specific files #
 ##########################
-/config/app.php
+
+#/config/app.php
+/bin/*
 /config/.env
 /logs/*
+/plugins/*
+/tests/*
 /tmp/*
 /vendor/*
+.travis.yml
+.composer.lock
+phpunit.xml.dist
 
 # OS generated files #
 ######################
@@ -17,8 +24,10 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
+
 # Tool specific files #
 #######################
+.editorconfig
 # vim
 *~
 *.swp
