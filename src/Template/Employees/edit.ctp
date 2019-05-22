@@ -4,19 +4,9 @@
  * @var \App\Model\Entity\Employee $employee
  */
 $userOptions=[];
-$jobTitleOptions=[];
-$departmentOptions=[];
 
 foreach ($users as $user) {
     $userOptions[$user['id']] = $user['first_name'] . " " . $user['middle_name'] . "  " . $user['last_name'] . " " . $user['email'];
-}
-
-foreach ($jobTitles as $jobTitle) {
-    $jobTitleOptions[$jobTitle['id']] = $jobTitle['job_title'];
-}
-
-foreach ($departments as $department) {
-    $departmentOptions[$department['id']]  = $department['department_name'];
 }
 
 ?>
@@ -52,8 +42,8 @@ foreach ($departments as $department) {
             echo $this->Form->control('user', ['options' => $userOptions, 'empty' => false]);
             echo $this->Form->control('employee_num');
             echo $this->Form->control('reporting_manager', ['options' => $userOptions, 'empty' => false]);
-            echo $this->Form->control('job_title_id', ['options' => $jobTitleOptions, 'empty' => true]);
-            echo $this->Form->control('department_id', ['options' => $departmentOptions, 'empty' => true]);
+            echo $this->Form->control('job_title_id', ['options' => $jobTitles, 'empty' => true]);
+            echo $this->Form->control('department_id', ['options' => $departments, 'empty' => true]);
             echo $this->Form->control('is_active');
             foreach ($customFieldsArray as $field) {
                 if ($field['type'] == 'select') {

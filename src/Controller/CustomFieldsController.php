@@ -19,6 +19,16 @@ class CustomFieldsController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
+    private $CustomFieldChoices;
+    private $CustomFieldValues;
+
+    public function initialize(){
+        parent::initialize();
+        $this->CustomFieldChoices = TableRegistry::getTableLocator()->get('CustomFieldChoices');
+        $this->CustomFieldValues = TableRegistry::getTableLocator()->get('CustomFieldValues');
+    }
+
+
     public function index()
     {
         $this->paginate = [
@@ -52,20 +62,28 @@ class CustomFieldsController extends AppController
      */
     public function add()
     {
+        //CREATE NEW CUSTOM FIELD ENTITIY
         $customField = $this->CustomFields->newEntity();
         if ($this->request->is('post')) {
+            //LOAD POST DATA OF CUSTOM FIELD IN ENTITY
             $customField = $this->CustomFields->patchEntity($customField, $this->request->getData());
+            //SET CUSTOM FIELD TABLE NAME TO EMPLOYEE
             $customField['table_name'] = 'employees';
+            //IF NEW CUSTOM FIELD IS SAVED
             if ($result = $this->CustomFields->save($customField)) {
-                if (count($this->request->getData('custom-field-choices')) > 0) {
+                //CHECK IF CUSTOM FIELD HAVE ANY CHOICES
+                if (!empty($this->request->getData('custom-field-choices'))) {
+                    //GET ID OF SAVED CUSTOM FIELD
                     $customFieldId = $result->id;
-                    $CustomFieldChoices = TableRegistry::getTableLocator()->get('CustomFieldChoices');
+                    //ITERATE THROUGH EVERY CHOICE OF CUSTOM FIELD
                     foreach ($this->request->getData('custom-field-choices') as $choice) {
-                        $customFieldChoice = $CustomFieldChoices->newEntity([
+                        //CREATE NEW CUSTOM FIELD CHOICE ENTITY AND LOAD DATA
+                        $customFieldChoice = $this->CustomFieldChoices->newEntity([
                             'field_id' => $customFieldId,
                             'choice_name' => $choice
                         ]);
-                        $CustomFieldChoices->save($customFieldChoice);
+                        //SAVE CUSTOM FIELD CHOICE ENTITY
+                        $this->CustomFieldChoices->save($customFieldChoice);
                     }
                 }
                 $this->Flash->success(__('The custom field has been saved.'));
@@ -89,46 +107,63 @@ class CustomFieldsController extends AppController
         $customField = $this->CustomFields->get($id, [
             'contain' => ['CustomFieldTypes']
         ]);
-        //GET CHOICE LIST FOR THIS CUSTOM FIELD
+        //VARIABLE TO STORE CHOICE LIST FOR THIS CUSTOM FIELD
         $customFieldChoiceData = [];
-        if ($customField->custom_field_type->field_type) {
-            $CustomFieldChoices = TableRegistry::getTableLocator()->get('CustomFieldChoices');
-            $customFieldChoices = $CustomFieldChoices->find('all')->where(['field_id' => $customField->id]);
+        //CHECK IF THIS CUSTOM FIELD IS OF TYPE DROPDOWN
+        if ($customField->custom_field_type->field_type == 'Dropdown') {
+            //FETCH CHOICES FOR THIS DROPDOWN CUSTOM FIELD
+            $customFieldChoices = $this->CustomFieldChoices->find('all')->where(['field_id' => $customField->id]);
+            //STORE CHOICES IN CHOICE LIST VARIABLE
             foreach ($customFieldChoices as $choice) {
                 $customFieldChoiceData[$choice->id] = $choice->choice_name;
             }
         }
         if ($this->request->is(['patch', 'post', 'put'])) {
+            //LOAD CUSTOM FIELD ENTITY FROM DATABASE AND APPLY CHANGES THROUGH POST DATA
             $customField = $this->CustomFields->patchEntity($customField, $this->request->getData());
+            //SET TABLE FOR THIS CUSTOM FIELD TO EMPLOYEES
             $customField['table_name'] = 'employees';
+            //IF THIS CUSTOM FIELD IS SAVED
             if ($this->CustomFields->save($customField)) {
-                $previousChoices = $this->request->getData('previous-custom-field-choices'); //MODIFIED OLD CHOICES
-                $newChoices = $this->request->getData('custom-field-choices');  //NEW CHOICES
-                foreach ($customFieldChoiceData as $key => $choice) {
-                    if (!empty($previousChoices[$key])) {
-                        //UPDATE
-                        $customFieldChoice = $CustomFieldChoices->get($key);
-                        $customFieldChoice['choice_name'] = $previousChoices[$key];
-                        $CustomFieldChoices->save($customFieldChoice);
-                    } else {
-                        //DELETE
-                        $customFieldChoice = $CustomFieldChoices->get($key);
-                        $CustomFieldChoices->delete($customFieldChoice);
-                        $CustomFieldValues = TableRegistry::getTableLocator()->get('CustomFieldValues');
-                        $CustomFieldValues->deleteAll(['field_value' => $key]);
-                    }
-                }
-                if (!empty($newChoices)) {
-                    foreach ($newChoices as $choice) {
-                        $customFieldChoice = $CustomFieldChoices->newEntity([
-                        'field_id' => $id,
-                        'choice_name' => $choice
-                    ]);
-                        $CustomFieldChoices->save($customFieldChoice);
-                    }
-                }
-                
+                //GET MODIFIED OLD CHOICES(AFTER MODIFICATION) OF THIS CUSTOM FIELD FROM POST DATA
+                $previousChoices = $this->request->getData('previous-custom-field-choices');
+                //GET NEW CHOICES ADDED TO THIS CUSTOM FIELD
+                $newChoices = $this->request->getData('custom-field-choices');
 
+                //ITERATE THROUGH OLD CHOICE LIST(BEFORE MODIFICATION) OF THIS CUSTOM FIELD
+                foreach ($customFieldChoiceData as $key => $choice) {
+                    //IF CHOICE IS EDITED
+                    if (!empty($previousChoices[$key])) {
+                        //GET CUSTOM FIELD CHOICE RECORD
+                        $customFieldChoice = $this->CustomFieldChoices->get($key);
+                        //UPDATE CHOICE NAME
+                        $customFieldChoice['choice_name'] = $previousChoices[$key];
+                        //SAVE CUSTOM FIELD CHOICE
+                        $this->CustomFieldChoices->save($customFieldChoice);
+                    }
+                    //IF CHOICE IS DELETED
+                    else {
+                        //GET CUSTOM FIELD CHOICE RECORD
+                        $customFieldChoice = $this->CustomFieldChoices->get($key);
+                        //DELETE CUSTOM FIELD CHOICE
+                        $this->CustomFieldChoices->delete($customFieldChoice);  
+                        //DELETE ALL RECORDS FROM CUSTOM FIELD VALUES TABLE THAT USE THIS CHOICE AS ITS VALUE
+                        $this->CustomFieldValues->deleteAll(['field_value' => $key]);
+                    }
+                }
+                //IF THERE ARE NEW CHOICES
+                if (!empty($newChoices)) {
+                    //ITERATE THROUGH NEW CHOICES
+                    foreach ($newChoices as $choice) {
+                        //CREATE NEW CHOICE ENTITY AND LOAD DATA
+                        $customFieldChoice = $this->CustomFieldChoices->newEntity([
+                            'field_id' => $id,
+                            'choice_name' => $choice
+                        ]);
+                        //SAVE NEW CUSTOM FIELD CHOICE
+                        $this->CustomFieldChoices->save($customFieldChoice);
+                    }
+                }
 
                 $this->Flash->success(__('The custom field has been saved.'));
 

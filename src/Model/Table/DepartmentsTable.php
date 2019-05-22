@@ -35,7 +35,7 @@ class DepartmentsTable extends Table
         parent::initialize($config);
 
         $this->setTable('departments');
-        $this->setDisplayField('id');
+        $this->setDisplayField('department_name');
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');

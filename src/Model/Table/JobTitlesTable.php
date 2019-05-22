@@ -35,7 +35,7 @@ class JobTitlesTable extends Table
         parent::initialize($config);
 
         $this->setTable('job_titles');
-        $this->setDisplayField('id');
+        $this->setDisplayField('job_title');
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');

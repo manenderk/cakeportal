@@ -13,6 +13,19 @@ use Cake\ORM\TableRegistry;
  */
 class EmployeesController extends AppController
 {
+    private $Users;
+    private $CustomFields;
+    private $CustomFieldValues;
+    private $CustomFieldChoices;
+
+    public function initialize(){
+        parent::initialize();
+        $this->Users = TableRegistry::getTableLocator()->get('Users');
+        $this->CustomFields = TableRegistry::getTableLocator()->get('CustomFields');
+        $this->CustomFieldValues = TableRegistry::getTableLocator()->get('CustomFieldValues');
+        $this->CustomFieldChoices = TableRegistry::getTableLocator()->get('CustomFieldChoices');
+    }
+
     /**
      * Index method
      *
@@ -42,30 +55,36 @@ class EmployeesController extends AppController
             'contain' => ['JobTitles', 'Departments']
         ]);
         
-        $Users = TableRegistry::getTableLocator()->get('Users');
-        $user = $Users->get($employee['user']);
+        //GET USER ENTITY FROM USER TABLE
+        $user = $this->Users->get($employee['user']);
 
+        //VARIABLE TO STORE CUSTOM FIELDS DATA
         $customFieldsData = [];
-        $CustomFields = TableRegistry::getTableLocator()->get('CustomFields');
-        $CustomFieldValues = TableRegistry::getTableLocator()->get('CustomFieldValues');
-        $customFields=$CustomFields->find('all')->where(['table_name' => 'employees'])->contain(['CustomFieldTypes']);
+        
+        //GET ALL CUSTOM FIELDS ON EMPLOYEES TABLE ALONG WITH THEIR TYPES
+        $customFields=$this->CustomFields->find('all')->where(['table_name' => 'employees'])->contain(['CustomFieldTypes']);
+        //ITERATE THROUGH EACH CUSTOM FIELD
         foreach ($customFields as $customField) {
+            //VARIABLE TO STORE SINGLE CUSTOM FIELD DATA
             $customFieldData = [];
+
             $customFieldData['name'] = $customField->field_name;
             $customFieldData['value'] = '';
-            $customFieldValues = $CustomFieldValues->find('all')->where(['record_id' => $employee->id, 'field_id' => $customField->id])->select(['field_value']);
+            
+            //FIND VALUE FOR THIS CUSTOM FIELD FOR THE CURRENT EMPLOYEE
+            $customFieldValues = $this->CustomFieldValues->find('all')->where(['record_id' => $employee->id, 'field_id' => $customField->id])->select(['field_value']);
             foreach ($customFieldValues as $customFieldValue) {
                 $customFieldData['value'] = $customFieldValue->field_value;
             }
-            
+
+            //IF THIS CUSTOM FIELD HAS TYPE DROPDOWN
             if ($customField->custom_field_type->field_type == 'Dropdown' && !empty($customFieldData['value'])) {
-                $CustomFieldChoices = TableRegistry::getTableLocator()->get('CustomFieldChoices');
-                $customFieldChoice = $CustomFieldChoices->get($customFieldData['value']);
+                $customFieldChoice = $this->CustomFieldChoices->get($customFieldData['value']);
+                //GET CHOICE NAME OF THIS CUSTOM DROPDOWN FIELD
                 $customFieldData['value'] = $customFieldChoice->choice_name;
             }
             $customFieldsData[] = $customFieldData;
         }
-
         $this->set(compact('employee', 'user', 'customFieldsData'));
     }
 
@@ -76,22 +95,30 @@ class EmployeesController extends AppController
      */
     public function add()
     {
+        //CREATE NEW EMPLOYEE ENTITY
         $employee = $this->Employees->newEntity();
         if ($this->request->is('post')) {
+            //LOAD EMPLOYEE ENTITY WITH POST DATA
             $employee = $this->Employees->patchEntity($employee, $this->request->getData());
+
+            //LOAD CREATED BY
             $employee['created_by'] = $this->Auth->user('id');
             
+            //IF THE EMPLOYEE IS SAVED
             if ($result = $this->Employees->save($employee)) {
-                $CustomFieldValues = TableRegistry::getTableLocator()->get('CustomFieldValues');
+
+                //GET CUSTOM FIELDS DATA/VALUE FOR THIS EMPLOYEE
                 $customFieldsData = $this->request->getData('customField');
                 foreach ($customFieldsData as $key => $value) {
-                    $customFieldValue = $CustomFieldValues->newEntity([
+                    //CREATE CUSTOM FIELD VALUES ENTITY AND LOAD DATA/VALUE
+                    $customFieldValue = $this->CustomFieldValues->newEntity([
                         'record_id' => $result->id,
                         'field_id' => $key,
                         'field_value' => $value
                     ]);
-                
-                    $CustomFieldValues->save($customFieldValue);
+                    
+                    //SAVE CUSTOM FIELD VALUES ENTITY
+                    $this->CustomFieldValues->save($customFieldValue);
                 }
 
                 $this->Flash->success(__('The employee has been saved.'));
@@ -100,34 +127,42 @@ class EmployeesController extends AppController
             $this->Flash->error(__('The employee could not be saved. Please, try again.'));
         }
            
-        $Users = TableRegistry::getTableLocator()->get('Users');
-
-        $CustomFields = TableRegistry::getTableLocator()->get('CustomFields');
-        $CustomFieldChoices = TableRegistry::getTableLocator()->get('CustomFieldChoices');
-        
+        //VARIABLE TO STORE CUSTOM FIELDS ON EMPLOYEES TABLE
         $customFieldsArray = [];
-        $customFields=$CustomFields->find('all')->where(['table_name' => 'employees'])->contain(['CustomFieldTypes']);
+        //FIND ALL CUSTOM FIELDS
+        $customFields=$this->CustomFields->find('all')->where(['table_name' => 'employees'])->contain(['CustomFieldTypes']);
         foreach ($customFields as $customField) {
+            //VARIABLE TO STORE SINGLE CUSTOM FIELD
             $customFieldEntity = [];
+
             $customFieldEntity['id'] = $customField->id;
             $customFieldEntity['name'] = $customField->field_name;
+            
+            //SET HTML INPUT TYPE BASED ON CUSTOM FIELD TYPE
             if ($customField->custom_field_type->field_type == 'String') {
                 $customFieldEntity['type'] = 'text';
             } elseif ($customField->custom_field_type->field_type == 'Number') {
                 $customFieldEntity['type'] = 'number';
             } elseif ($customField->custom_field_type->field_type == 'Dropdown') {
                 $customFieldEntity['type'] = 'select';
-                $customFieldChoices = $CustomFieldChoices->find('all')->select(['id', 'choice_name'])->where(['field_id' => $customField->id]);
+                $customFieldChoices = $this->CustomFieldChoices->find('all')->select(['id', 'choice_name'])->where(['field_id' => $customField->id]);
                 foreach ($customFieldChoices as $choice) {
                     $customFieldEntity['choices'][$choice->id] = $choice->choice_name;
                 }
             }
+            //PUSH SINGLE CUSTOM FIELD
             $customFieldsArray[] = $customFieldEntity;
         }
-                
-        $users = $Users->find('all')->select(['id', 'first_name', 'middle_name', 'last_name', 'email']);
-        $jobTitles = $this->Employees->JobTitles->find('all')->select(['id', 'job_title']);
-        $departments = $this->Employees->Departments->find('all')->select(['id', 'department_name']);
+        
+        //GET ALL USERS FOR USER AND REPORTING MANAGER INPUT FIELD
+        $users = $this->Users->find('all')->select(['id', 'first_name', 'middle_name', 'last_name', 'email']);
+
+        //GET ALL JOB TITLES FOR JOB TITLE INPUT FIELDS
+        $jobTitles = $this->Employees->JobTitles->find('list');
+        
+        //GET ALL DEPARTMENTS FOR DEPARTMENT FIELD
+        $departments = $this->Employees->Departments->find('list');
+        
         $this->set(compact('employee', 'jobTitles', 'departments', 'users', 'customFieldsArray'));
     }
 
@@ -140,84 +175,104 @@ class EmployeesController extends AppController
      */
     public function edit($id = null)
     {
+        //GET EMPLOYEE ENTITY FOR PROVIDED ID
         $employee = $this->Employees->get($id, [
             'contain' => []
         ]);
 
-        $CustomFields = TableRegistry::getTableLocator()->get('CustomFields');
-        $CustomFieldChoices = TableRegistry::getTableLocator()->get('CustomFieldChoices');
-        $CustomFieldValues = TableRegistry::getTableLocator()->get('CustomFieldValues');
+        //SAVE EMPLOYEE 
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            //LOAD EMPLOYEE ENTITY WITH POST DATA
+            $employee = $this->Employees->patchEntity($employee, $this->request->getData());
 
+            //ADD MODIFIED BY
+            $employee['modified_by'] = $this->Auth->user('id');
+
+            //IF EMPLOYEE IS SAVED
+            if ($this->Employees->save($employee)) {
+                //GET CUSTOM FIELDS DATA FOR THIS EMPLOYEE FROM POST DATA
+                $customFieldsData = $this->request->getData('customField');
+
+                //ITERATE THROUGH CUSTOM FIELDS DATA
+                foreach ($customFieldsData as $key => $value) {
+                    //FIND CUSTOM FIELD VALUE RECORD FOR THIS EMPLOYEE FOR THIS CUSTOM FIELD
+                    $customFieldValues = $this->CustomFieldValues->find('all')->where(['record_id' => $id, 'field_id' => $key]);
+                    //IF THERE IS ANY CUSTOM FIELD VALUE ENTITY
+                    if ($customFieldValues->count() > 0) {
+                        //ITERATE THROUGH EVERY CUSTOM FIELD VALUES
+                        foreach ($customFieldValues as $customField) {
+                            //GET THIS CUSTOM FIELD VALUE ENTITY
+                            $field = $this->CustomFieldValues->get($customField->id);
+                            //UPDATE VALUE
+                            $field['field_value'] = $value;
+                            //SAVE CUSTOM FIELD VALUE ENTITY
+                            $this->CustomFieldValues->save($field);
+                        }
+                    } 
+                    //THERE IS NEW CUSTOM FIELD VALUE ENTITY
+                    else {
+                        //CREATE NEW CUSTOM FIELD VALUE ENTITY AND LOAD DATA
+                        $field = $this->CustomFieldValues->newEntity([
+                            'record_id' => $id,
+                            'field_id' => $key,
+                            'field_value' => $value
+                        ]);
+                        //SAVE CUSTOM FIELD VALUE ENTITY
+                        $this->CustomFieldValues->save($field);
+                    }
+                }
+
+                $this->Flash->success(__('The employee has been saved.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('The employee could not be saved. Please, try again.'));
+        }
+
+        //VARIABLE TO STORE CUSTOM FIELDS FOR EMPLOYEE
         $customFieldsArray = [];
 
-        //GET ALL CUSTOM FIELDS FOR EMPLOYEE
-        $customFields=$CustomFields->find('all')->where(['table_name' => 'employees'])->contain(['CustomFieldTypes']);
+        //FIND ALL CUSTOM FIELDS FOR EMPLOYEE
+        $customFields=$this->CustomFields->find('all')->where(['table_name' => 'employees'])->contain(['CustomFieldTypes']);
+        //ITERATE TROUGH EACH CUSTOM FIELD
         foreach ($customFields as $customField) {
+            //VARIABLE TO SORE SINGLE CUSTOM FIELD FOR EMPLOYEE
             $customFieldEntity = [];
-            $customFieldEntity['id'] = $customField->id;                //GET CUSTOM FIELD ID
-            $customFieldEntity['name'] = $customField->field_name;      //GET CUSTOM FIELD NAME
+            $customFieldEntity['id'] = $customField->id;
+            $customFieldEntity['name'] = $customField->field_name;
 
-            //GET CUSTOM FIELD TYPE
+            //GET HTML INPUT TYPE FORM CUSTOM FIELD TYPE
             if ($customField->custom_field_type->field_type == 'String') {
                 $customFieldEntity['type'] = 'text';
             } elseif ($customField->custom_field_type->field_type == 'Number') {
                 $customFieldEntity['type'] = 'number';
             } elseif ($customField->custom_field_type->field_type == 'Dropdown') {
                 $customFieldEntity['type'] = 'select';
-                $customFieldChoices = $CustomFieldChoices->find('all')->select(['id', 'choice_name'])->where(['field_id' => $customField->id]);
+                //IF TYPE IS DROPDOWN THEN GET ITS CHOICES
+                $customFieldChoices = $this->CustomFieldChoices->find('all')->select(['id', 'choice_name'])->where(['field_id' => $customField->id]);
                 foreach ($customFieldChoices as $choice) {
                     $customFieldEntity['choices'][$choice->id] = $choice->choice_name;
                 }
             }
 
-            //GET CUSTOM FIELD VALUE
+            //VARIABLE TO STORE THIS CUSTOM FIELD VALUE
             $customFieldEntity['value'] = '';
-            $customFieldValues = $CustomFieldValues->find('all')->where(['record_id' => $employee->id, 'field_id' => $customField->id])->select(['field_value']);
+            $customFieldValues = $this->CustomFieldValues->find('all')->where(['record_id' => $employee->id, 'field_id' => $customField->id])->select(['field_value']);
             foreach ($customFieldValues as $customFieldValue) {
                 $customFieldEntity['value'] = $customFieldValue->field_value;
             }
-
+            //PUSH SINGLE CUSTOM FIELD ENTITY IN ARRAY
             $customFieldsArray[] = $customFieldEntity;
         }
 
+        //GET ALL USERS FOR USER AND REPORTING MANAGER INPUT FIELD
+        $users = $this->Users->find('all')->select(['id', 'first_name', 'middle_name', 'last_name', 'email']);
 
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            $employee = $this->Employees->patchEntity($employee, $this->request->getData());
-            $employee['modified_by'] = $this->Auth->user('id');
-            if ($this->Employees->save($employee)) {
-
-                //UPDATE CUSTOM FIELDS DATA
-                $CustomFieldValues = TableRegistry::getTableLocator()->get('CustomFieldValues');
-                $customFieldsData = $this->request->getData('customField');
-                foreach ($customFieldsData as $key => $value) {
-                    $customFieldValues = $CustomFieldValues->find('all')->where(['record_id' => $id, 'field_id' => $key]);
-                    if ($customFieldValues->count() > 0) {
-                        foreach ($customFieldValues as $customField) {
-                            $field = $CustomFieldValues->get($customField->id);
-                            $field['field_value'] = $value;
-                            $CustomFieldValues->save($field);
-                        }
-                    } else {
-                        $field = $CustomFieldValues->newEntity([
-                            'record_id' => $id,
-                            'field_id' => $key,
-                            'field_value' => $value
-                        ]);
-                        $CustomFieldValues->save($field);
-                    }
-                }
-
-                $this->Flash->success(__('The employee has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            }
-            $this->Flash->error(__('The employee could not be saved. Please, try again.'));
-        }
-
-        $Users = TableRegistry::getTableLocator()->get('Users');
-        $users = $Users->find('all')->select(['id', 'first_name', 'middle_name', 'last_name', 'email']);
-        $jobTitles = $this->Employees->JobTitles->find('all');
-        $departments = $this->Employees->Departments->find('all');
+        //GET ALL JOB TITLES FOR JOB TITLE INPUT FIELDS
+        $jobTitles = $this->Employees->JobTitles->find('list');
+        
+        //GET ALL DEPARTMENTS FOR DEPARTMENT FIELD
+        $departments = $this->Employees->Departments->find('list');
+        
         $this->set(compact('employee', 'jobTitles', 'departments', 'users', 'customFieldsArray'));
     }
 
