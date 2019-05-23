@@ -21,9 +21,21 @@
         <?php
             echo $this->Form->control('role_name');
             echo $this->Form->control('active');
-            echo $this->Form->control('created_by');
-            echo $this->Form->control('modified_by');
         ?>
+    </fieldset>
+    <hr>
+    <fieldset>
+        <legend><?= __('Roles Access') ?></legend>
+        <table>
+            <?php foreach ($controllers as $controller) : ?>
+                <tr class="acl-controller-list">
+                    <td><b><?= implode(" ",preg_split('/(?=[A-Z])/',$controller)) ?></b></td>
+                    <td><?= $this->Form->control("controllers[$controller][read]", ['type'=>'checkbox', 'label'=>'Read']) ?></td>
+                    <td><?= $this->Form->control("controllers[$controller][write]", ['type'=>'checkbox', 'label'=>'Write']) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+        
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>
     <?= $this->Form->end() ?>
