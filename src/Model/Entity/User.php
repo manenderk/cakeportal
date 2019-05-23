@@ -44,7 +44,9 @@ class User extends Entity
         'is_active' => true,
         'last_login' => true,
         'created' => true,
-        'modified' => true
+        'modified' => true,
+        'created_by' => true,
+        'modified_by' => true
     ];
 
     /**

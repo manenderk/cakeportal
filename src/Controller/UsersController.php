@@ -3,7 +3,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\I18n\Time;
-
+use Cake\ORM\TableRegistry;
 
 /**
  * Users Controller
@@ -14,9 +14,14 @@ use Cake\I18n\Time;
  */
 class UsersController extends AppController
 {
+    private $Groups;
+    private $UserGroups;
+
     public function initialize()
     {
         parent::initialize();
+        $this->Groups = TableRegistry::getTableLocator()->get('Groups');
+        $this->UserGroups = TableRegistry::getTableLocator()->get('UserGroups');
         $this->Auth->allow(['logout']);
     }
     /**
@@ -54,17 +59,35 @@ class UsersController extends AppController
      */
     public function add()
     {
+        //CREATE NEW USER ENTITY
         $user = $this->Users->newEntity();
         if ($this->request->is('post')) {
+            //LOAD NEW USER ENTITY WITH POST DATA
             $user = $this->Users->patchEntity($user, $this->request->getData());
-            if ($this->Users->save($user)) {
+            if ($result = $this->Users->save($user)) {
+                //IF ANY GROUPS SPECIFIED FOR THIS USER
+                if (!empty($this->request->getData('userGroups'))) {
+                    //GET ID OF SELECTED GROUPS
+                    $groups = $this->request->getData('userGroups');
+                    foreach ($groups as $group) {
+                        //CREATE NEW USER GROUP ENTITY AND LOAD USER ID AND GROUP ID
+                        $userGroup = $this->UserGroups->newEntity([
+                            'user_id' => $result->id,
+                            'group_id' => $group
+                        ]);
+                        //SAVE NEW USER GROUP ENTITY
+                        $this->UserGroups->save($userGroup);
+                    }
+                }
                 $this->Flash->success(__('The user has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The user could not be saved. Please, try again.'));
         }
-        $this->set(compact('user'));
+        //GET LIST OF ALL AVAILABLE GROUPS
+        $groups = $this->Groups->find('list');
+        $this->set(compact('user', 'groups'));
     }
 
     /**
@@ -72,23 +95,57 @@ class UsersController extends AppController
      *
      * @param string|null $id User id.
      * @return \Cake\Http\Response|null Redirects on successful edit, renders view otherwise.
-     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundgroupsException When record not found.
      */
     public function edit($id = null)
     {
         $user = $this->Users->get($id, [
             'contain' => []
         ]);
+        //GET LIST OF GROUPS OF THIS USER
+        $userGroups = $this->UserGroups->find()->select(['group_id'])->where(['user_id' => $id]);
+        //VARIABLE TO STORE GROUPS ID
+        $userGroupsId = [];
+        foreach ($userGroups as $group) {
+            $userGroupsId[] = $group->group_id;         //STORE GROUP ID IN VARIABLE
+        }
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
+                //IF THERE IS GROUP DATA FOR THIS USER
+                if (!empty($this->request->getData('userGroups'))) {
+                    //GET ID OF NEW GROUPS OF THIS USER
+                    $newUserGroupsId = $this->request->getData('userGroups');
+
+                    //ITERATE THROUGH LIST OF OLD GROUPS ID
+                    foreach ($userGroupsId as $groupId) {
+                        //IF OLD GROUP ID IS NOT PRESENT IN NEW LIST THEN DELETE CORRESPONDING USER GROUP ENTITY
+                        if (!in_array($groupId, $newUserGroupsId)) {
+                            $this->UserGroups->deleteAll(['user_id' => $id, 'group_id' => $groupId]);
+                        }
+                    }
+                    //ITERATE THROUGH LIST OF NEW GROUPS ID
+                    foreach ($newUserGroupsId as $groupId) {
+                        //IF NEW GROUP ID IS NOT PRESENT IN OLD LIST THEN ADD CORRESPONDING USER GROUP ENTITY
+                        if (!in_array($groupId, $userGroupsId)) {
+                            $userGroup = $this->UserGroups->newEntity([
+                            'user_id' => $id,
+                            'group_id' => $groupId
+                        ]);
+                            $this->UserGroups->save($userGroup);
+                        }
+                    }
+                }
+
                 $this->Flash->success(__('The user has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The user could not be saved. Please, try again.'));
         }
-        $this->set(compact('user'));
+        $groups = $this->Groups->find('list');
+        
+        $this->set(compact('user', 'groups', 'userGroupsId'));
     }
 
     /**

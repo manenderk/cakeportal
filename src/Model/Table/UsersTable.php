@@ -33,7 +33,7 @@ class UsersTable extends Table
         parent::initialize($config);
 
         $this->setTable('users');
-        $this->setDisplayField('id');
+        $this->setDisplayField(['first_name', 'last_name', 'email']);
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
@@ -104,6 +104,12 @@ class UsersTable extends Table
         $validator
             ->dateTime('last_login')
             ->allowEmptyDateTime('last_login');
+
+        $validator
+            ->allowEmptyString('created_by');
+
+        $validator
+            ->allowEmptyString('modified_by');
 
         return $validator;
     }

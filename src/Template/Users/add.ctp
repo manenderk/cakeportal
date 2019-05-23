@@ -24,8 +24,12 @@
             echo $this->Form->control('contact_number');
             echo $this->Form->control('profile_pic');
             echo $this->Form->control('is_active');
-            echo $this->Form->control('last_login', ['empty' => true]);
         ?>
+    </fieldset>
+    <hr>
+    <fieldset>
+        <legend><?= __('User Groups') ?></legend>
+        <?= $this->Form->Control('userGroups' , ['options' => $groups, 'label' => false, 'multiple'=>true]); ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>
     <?= $this->Form->end() ?>
