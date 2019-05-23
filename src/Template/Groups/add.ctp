@@ -21,9 +21,12 @@
         <?php
             echo $this->Form->control('group_name');
             echo $this->Form->control('active');
-            echo $this->Form->control('created_by');
-            echo $this->Form->control('modified_by');
         ?>
+    </fieldset>
+     <hr>
+    <fieldset>
+        <legend><?= __('Group Roles') ?></legend>
+        <?= $this->Form->Control('groupRoles' , ['options' => $roles, 'label' => false, 'multiple'=>true]); ?>
     </fieldset>
     <?= $this->Form->button(__('Submit')) ?>
     <?= $this->Form->end() ?>

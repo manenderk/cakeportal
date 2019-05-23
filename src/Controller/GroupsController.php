@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\ORM\TableRegistry;
 
 /**
  * Groups Controller
@@ -12,6 +13,15 @@ use App\Controller\AppController;
  */
 class GroupsController extends AppController
 {
+    private $Roles;
+    private $GroupRoles;
+
+    public function initialize()
+    {
+        parent::initialize();
+        $this->Roles = TableRegistry::getTableLocator()->get('Roles');
+        $this->GroupRoles = TableRegistry::getTableLocator()->get('GroupRoles');
+    }
     /**
      * Index method
      *
@@ -34,7 +44,7 @@ class GroupsController extends AppController
     public function view($id = null)
     {
         $group = $this->Groups->get($id, [
-            'contain' => ['GroupRoles', 'UserGroups']
+            'contain' => ['GroupRoles', 'groupRoles']
         ]);
 
         $this->set('group', $group);
@@ -50,14 +60,31 @@ class GroupsController extends AppController
         $group = $this->Groups->newEntity();
         if ($this->request->is('post')) {
             $group = $this->Groups->patchEntity($group, $this->request->getData());
-            if ($this->Groups->save($group)) {
+            if ($result = $this->Groups->save($group)) {
+                //IF ANY ROLES SPECIFIED FOR THIS GROUP
+                if (!empty($this->request->getData('groupRoles'))) {
+                    //GET ID OF SELECTED ROLES
+                    $roles = $this->request->getData('groupRoles');
+                    foreach ($roles as $role) {
+                        //CREATE NEW GROUP ROLES ENTITY AND LOAD GROUP ID AND ROLE ID
+                        $groupRole = $this->GroupRoles->newEntity([
+                            'group_id' => $result->id,
+                            'role_id' => $role
+                        ]);
+                        //SAVE NEW GROUP ROLE ENTITY
+                        $this->GroupRoles->save($groupRole);
+                    }
+                }
+
                 $this->Flash->success(__('The group has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The group could not be saved. Please, try again.'));
         }
-        $this->set(compact('group'));
+        //GET LIST OF ALL AVAILABLE ROLES
+        $roles = $this->Roles->find('list');
+        $this->set(compact('group', 'roles'));
     }
 
     /**
@@ -72,16 +99,51 @@ class GroupsController extends AppController
         $group = $this->Groups->get($id, [
             'contain' => []
         ]);
+        //GET LIST OF ROLES OF THIS GROUP
+        $groupRoles = $this->GroupRoles->find()->select(['role_id'])->where(['group_id' => $id]);
+        //VARIABLE TO STORE ROLEs ID
+        $groupRolesId = [];
+        foreach ($groupRoles as $role) {
+            $groupRolesId[] = $role->role_id;         //STORE ROLE ID IN VARIABLE
+        }
+
         if ($this->request->is(['patch', 'post', 'put'])) {
             $group = $this->Groups->patchEntity($group, $this->request->getData());
             if ($this->Groups->save($group)) {
+                //IF THERE IS ROLE DATA FOR THIS GROUP
+                if (!empty($this->request->getData('groupRoles'))) {
+                    //GET ID OF NEW ROLES OF THIS GROUP
+                    $newGroupRoleId = $this->request->getData('groupRoles');
+
+                    //ITERATE THROUGH LIST OF OLD ROLES ID
+                    foreach ($groupRolesId as $roleId) {
+                        //IF OLD ROLE ID IS NOT PRESENT IN NEW LIST THEN DELETE CORRESPONDING GROUP ROLE ENTITY
+                        if (!in_array($roleId, $newGroupRoleId)) {
+                            $this->GroupRoles->deleteAll(['group_id' => $id, 'role_id' => $roleId]);
+                        }
+                    }
+                    //ITERATE THROUGH LIST OF NEW ROLES ID
+                    foreach ($newGroupRoleId as $roleId) {
+                        //IF NEW ROLE ID IS NOT PRESENT IN OLD LIST THEN ADD CORRESPONDING GROUP ROLE ENTITY
+                        if (!in_array($roleId, $groupRolesId)) {
+                            $groupRole = $this->GroupRoles->newEntity([
+                                'group_id' => $id,
+                                'role_id' => $roleId
+                            ]);
+                            $this->GroupRoles->save($groupRole);
+                        }
+                    }
+                }
+
                 $this->Flash->success(__('The group has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The group could not be saved. Please, try again.'));
         }
-        $this->set(compact('group'));
+        //GET LIST OF ALL AVAILABLE ROLES
+        $roles = $this->Roles->find('list');
+        $this->set(compact('group', 'groupRolesId', 'roles'));
     }
 
     /**
