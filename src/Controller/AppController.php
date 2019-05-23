@@ -63,8 +63,11 @@ class AppController extends Controller
             'unauthorizedRedirect' => $this->referer()
         ]);
         
+        //GET CURRENT USER ID
         $currentUserId = $this->Auth->user('id');
+        //LOAD ACL COMPONENT
         $this->loadComponent('AccessControl');
+        //IF USER IS ALLOWED TO ACCESS REQUESTED RESOURCE
         var_dump($this->AccessControl->isAllowed($currentUserId));
         /*
          * Enable the following component for recommended CakePHP security settings.
