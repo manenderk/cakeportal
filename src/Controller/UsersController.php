@@ -171,15 +171,6 @@ class UsersController extends AppController
     public function login()
     {
         $this->viewBuilder()->setLayout('login');
-        /* if ($this->request->is('post')) {
-            $user = $this->Auth->identify();
-            if ($user) {
-                $this->Users->updateAll(['last_login' => Time::now()], ['id' => $user['id']]);
-                $this->Auth->setUser($user);
-                return $this->redirect($this->Auth->redirectUrl());
-            }
-            $this->Flash->error('Your username or password is incorrect.');
-        } */
         if ($this->request->is('post')) {
             $user = $this->Auth->identify();
             if ($user['is_active'] == 0) {
@@ -190,6 +181,7 @@ class UsersController extends AppController
                 exit;
             }
             if ($user) {
+                $this->Users->updateAll(['last_login' => Time::now()], ['id' => $user['id']]);
                 $this->Auth->setUser($user);
                 //Update last login time stamp
                 /* $UsersTable = TableRegistry::get('Users');

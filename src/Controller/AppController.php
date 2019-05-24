@@ -67,6 +67,23 @@ class AppController extends Controller
         $currentUserId = $this->Auth->user('id');
         //LOAD ACL COMPONENT
         $this->loadComponent('AccessControl');
+
+        if ($this->request->session()->read('Auth.User.id')!='') {
+            
+            /*$this->loadComponent('Notification');
+            $this->loadComponent('Todo');
+
+            $notificationsArr = $this->Notification->getAllNotifications($this->request->session()->read('Auth.User.id'));
+            $totalNotification = $this->Notification->getTotalNotifications($this->request->session()->read('Auth.User.id'));
+            $moreNotification = $totalNotification - 6;                        
+            $todoArr = $this->Todo->getAllTodoNotifications($this->request->session()->read('Auth.User.id')); */
+        
+            $this->set('todoArr', $todoArr = []);
+            $this->set('notificationsArr', $notificationsArr = []);
+            $this->set('total', $totalNotification = 0);
+            $this->set('more', $moreNotification = []);
+        }
+
         //IF USER IS ALLOWED TO ACCESS REQUESTED RESOURCE
         //var_dump($this->AccessControl->isAllowed($currentUserId));
         /*
