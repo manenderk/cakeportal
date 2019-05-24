@@ -10,7 +10,7 @@
             width: 100%;
             height: 100%;
             z-index: 9999;
-            background: url(<?= $this->request->webroot ?>img/wait.gif) 50% 50% no-repeat rgb(249, 249, 249);
+            background: url(<?= $this->request->getAttribute('webroot') ?>img/wait.gif) 50% 50% no-repeat rgb(249, 249, 249);
         }
     </style>
     <meta charset="utf-8">
@@ -69,8 +69,8 @@
     </script>
 </head>
 <?php
-$controller = $this->request->params['controller'];
-$action = $this->request->params['action'];
+$controller = $this->request->getParam('controller');
+$action = $this->request->getParam('action');
 
 if ($controller=='Profiles') {
     $search_class = 'navbar-form open';

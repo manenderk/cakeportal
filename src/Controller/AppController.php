@@ -68,7 +68,7 @@ class AppController extends Controller
         //LOAD ACL COMPONENT
         $this->loadComponent('AccessControl');
 
-        if ($this->request->session()->read('Auth.User.id')!='') {
+        if ($this->request->getSession()->read('Auth.User.id')!='') {
             
             /*$this->loadComponent('Notification');
             $this->loadComponent('Todo');
