@@ -68,7 +68,7 @@ class AppController extends Controller
         //LOAD ACL COMPONENT
         $this->loadComponent('AccessControl');
         //IF USER IS ALLOWED TO ACCESS REQUESTED RESOURCE
-        var_dump($this->AccessControl->isAllowed($currentUserId));
+        //var_dump($this->AccessControl->isAllowed($currentUserId));
         /*
          * Enable the following component for recommended CakePHP security settings.
          * see https://book.cakephp.org/3.0/en/controllers/components/security.html

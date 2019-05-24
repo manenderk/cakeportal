@@ -170,7 +170,8 @@ class UsersController extends AppController
 
     public function login()
     {
-        if ($this->request->is('post')) {
+        $this->viewBuilder()->setLayout('login');
+        /* if ($this->request->is('post')) {
             $user = $this->Auth->identify();
             if ($user) {
                 $this->Users->updateAll(['last_login' => Time::now()], ['id' => $user['id']]);
@@ -178,11 +179,50 @@ class UsersController extends AppController
                 return $this->redirect($this->Auth->redirectUrl());
             }
             $this->Flash->error('Your username or password is incorrect.');
+        } */
+        if ($this->request->is('post')) {
+            $user = $this->Auth->identify();
+            if ($user['is_active'] == 0) {
+                $this->Auth->logout();
+                $dataJson['msg'] = 'You are not authorized to access ATS.';
+                $dataJson['success'] = false;
+                echo json_encode($dataJson);
+                exit;
+            }
+            if ($user) {
+                $this->Auth->setUser($user);
+                //Update last login time stamp
+                /* $UsersTable = TableRegistry::get('Users');
+                $users = $UsersTable->get($user['id']);
+                $users->last_login = date('Y-m-d h:m:s');
+                $UsersTable->save($users); */
+                $dataJson['success'] = true;
+                /* if ($user['user_role_id'] == 6) {
+                    $dataJson['url'] = "../job_requirements/add";
+                } elseif ($user['user_role_id'] == 2) {
+                    $dataJson['url'] = "../job_requirements/today_requirements";
+                } elseif ($user['user_role_id'] == 1 || $user['user_role_id'] == 8) {
+                    $dataJson['url'] = "../dashboard/view_admin";
+                } else {
+                    $dataJson['url'] = "../job_requirements";
+                } */
+                $dataJson['url'] = '../employees/';
+                $dataJson['msg'] = "Authentication Successful!  Redirecting...";
+                echo json_encode($dataJson);
+                exit;
+            //return $this->redirect($this->Auth->redirectUrl());
+            } else {
+                $dataJson['msg'] = 'Invalid Username/Password.';
+                $dataJson['success'] = false;
+                echo json_encode($dataJson);
+                exit;
+            }
+            $this->Flash->error('Your username or password is incorrect.');
         }
     }
 
-    public function logout()
-    {
+    public function logout() {
+        $this->layout = 'logout';
         $this->Flash->success('You are now logged out.');
         return $this->redirect($this->Auth->logout());
     }
