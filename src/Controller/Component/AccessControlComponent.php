@@ -69,17 +69,11 @@ class AccessControlComponent extends Component
             $groupRoles = $this->GroupRoles->find('all')->where(['group_id' => $groupId]);
             //ITERATE THROUGH EACH ROLE
             foreach($groupRoles as $groupRole){
-                //PUSH ROLE ID IN VARIABLE
-                $roleIds[] = $groupRole->role_id;
-                /*
+                //IF ROLE ID IS NOT ALREADY IN ARRAY THEN PUSH IT IN ARRAY OF ROLE IDs
                 if(!in_array($groupRole->role_id, $roleIds))
-                    $roleIds = $groupRole->role_id;
-                */
+                    $roleIds[] = $groupRole->role_id;                
             }
         }
-
-        //GET UNIQUE ROLE IDS
-        $roleIds = array_unique($roleIds);
 
         //FLAG TO RETURN IF USER HAS ACCESS TO REQUESTED RESOURCE OR NOT
         $allow = false;
