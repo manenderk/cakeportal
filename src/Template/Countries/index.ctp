@@ -14,7 +14,7 @@
                         <span class="btn-label"><i class="fa fa-hand-o-left"></i>
                         </span>Back</button>
                 </a>
-                <!-- TODO: HIDE THIS BUTTON AS PER ACL -->
+                <!-- TODO: ACL - SHOW ONLY WHEN USER HAS WRITE ACCESS -->
                 <a
                     href="<?php echo $this->Url->build(["controller" => "countries", "action" => "add"]); ?>">
                     <button type="button" class="btn btn-labeled btn-default">
@@ -56,6 +56,7 @@
                     <div class="rTableHead"><?=$this->Paginator->sort('is_active', "Status <em class='fa fa-sort-alpha-desc'></em>", ['escape' => false]);?>
                     </div>
                 </span>
+                <!-- TODO: ACL - SHOW ONLY WHEN USER HAS WRITE ACCESS -->
                 <span>
                     <div class="rTableHead">&nbsp;</div>
                 </span>
@@ -82,6 +83,7 @@
 
                     </div>
                 </span>
+                <!-- TODO: ACL - SHOW ONLY WHEN USER HAS WRITE ACCESS -->
                 <span>
                     <div class="rTableCell"> <a
                             href="<?php echo $this->Url->build(["controller" => "countries", "action" => "edit",$country->id]); ?>"

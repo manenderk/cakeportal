@@ -17,7 +17,8 @@ class CountriesController extends AppController
      *
      * @return \Cake\Http\Response|void
      */
-    public function index() {
+    public function index()
+    {
         if ($this->request->is('post')) {
             if (!empty($this->request->data['name']) && $this->request->data['name'] != '') {
                 $country_name = $this->request->data['name'];
@@ -53,10 +54,11 @@ class CountriesController extends AppController
     public function view($id = null)
     {
         $country = $this->Countries->get($id, [
+            //'contain' => ['JobRequirements', 'States']        // TODO Add JobRequirements and States
             'contain' => []
         ]);
-
         $this->set('country', $country);
+        $this->set('_serialize', ['country']);
     }
 
     /**
@@ -65,7 +67,7 @@ class CountriesController extends AppController
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
     public function add()
-    {        
+    {
         $country = $this->Countries->newEntity();
         if ($this->request->is('post')) {
             $country = $this->Countries->patchEntity($country, $this->request->data);
@@ -93,7 +95,7 @@ class CountriesController extends AppController
         $country = $this->Countries->get($id, [
             'contain' => []
         ]);
-        if ($this->request->is(['patch', 'post', 'put'])) {            
+        if ($this->request->is(['patch', 'post', 'put'])) {
             $country = $this->Countries->patchEntity($country, $this->request->data);
             $country['modified_by'] = $this->Auth->user('id');
             if ($this->Countries->save($country)) {
@@ -127,7 +129,8 @@ class CountriesController extends AppController
         return $this->redirect(['action' => 'index']);
     } */
 
-    public function check_country_name($id = null) {
+    public function check_country_name($id = null)
+    {
         $country_name = $this->request->data['name'];
         if (!empty($id)) {
             $countryName = $this->Countries->find('all')->select(['name'])->where(['name' => $country_name, 'NOT' => array('id' => $id)]);
