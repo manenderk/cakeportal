@@ -20,8 +20,8 @@ class CountriesController extends AppController
     public function index()
     {
         if ($this->request->is('post')) {
-            if (!empty($this->request->data['name']) && $this->request->data['name'] != '') {
-                $country_name = $this->request->data['name'];
+            if (!empty($this->request->getData('name'))) {
+                $country_name = $this->request->getData('name');
                 $limit = 1000;
             } else {
                 $country_name = '';
@@ -131,7 +131,7 @@ class CountriesController extends AppController
 
     public function check_country_name($id = null)
     {
-        $country_name = $this->request->data['name'];
+        $country_name = $this->request->getData('name');
         if (!empty($id)) {
             $countryName = $this->Countries->find('all')->select(['name'])->where(['name' => $country_name, 'NOT' => array('id' => $id)]);
         } else {

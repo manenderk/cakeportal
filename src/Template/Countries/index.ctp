@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<?= $this->Form->create('Countries', array('role'=>'form','action' =>'/index')); ?>
+<?= $this->Form->create('Countries', ['role'=>'form', 'url' => ['action' =>'index']]); ?>
     <div class="panel panel-body atsborder m-lr">
         <div class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
             <div class="input-group m-b">
