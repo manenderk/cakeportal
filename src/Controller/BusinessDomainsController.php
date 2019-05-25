@@ -114,7 +114,7 @@ class BusinessDomainsController extends AppController
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    /* public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
         $businessDomain = $this->BusinessDomains->get($id);
@@ -125,5 +125,22 @@ class BusinessDomainsController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    } */
+
+    public function check_domain_name($id = null) {
+        $domain_name = $this->request->getData('name');
+        if ($id != '') {
+            $domainName = $this->BusinessDomains->find('all')->select(['name'])->where(['name' => $domain_name, 'NOT' => array('id' => $id)]);
+        } else {
+            $domainName = $this->BusinessDomains->find('all')->select(['name'])->where(['name' => $domain_name]);
+        }
+        $domainArr = $domainName->toArray();
+        if (count($domainArr) > 0) {
+            $dataArr['success'] = 'true';
+        } else {
+            $dataArr['success'] = 'false';
+        }
+        echo json_encode($dataArr);
+        exit;
     }
 }

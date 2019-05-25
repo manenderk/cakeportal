@@ -52,6 +52,38 @@
 </div>
 <?= $this->Form->end() ?>
 <script>
+    // TODO: Add CSRF THIS IS NOT COMPLETE ALSO NEEDED TO DO SAME THING IN EDIT.CTP
+    $(document).ready(function() {
+        $("#name").blur(function() {
+            var domain_name = $("#name").val();
+            var dataString = 'name=' + domain_name;
+            // AJAX Code To Submit Form.
+            var url = "<?= $this->Url->build(["controller" => "BusinessDomains", "action" => "check_domain_name"]); ?>";
+            $('#message').show();
+            $('#message').html("<img src='/img/loading.gif'>&nbsp;&nbsp;<span style='font-weight: bold;font-size:12px;'>Checking domain name....</span>");
+            $.ajax({
+                type: "POST",
+                url: "<?= $this->Url->build(["controller" => "BusinessDomains", "action" => "check_domain_name"]); ?>",
+                data: dataString,
+                cache: false,
+                success: function(result) {
+                    var obj = $.parseJSON(result);
+                    if (obj.success == 'true') {
+                        $('#message').show();
+                        $('#message').html('Business Domain name already exist! Please try another');
+                        $('#message').css("color", "red");
+                        $('#submitBtn').attr('disabled', true);
+                    }
+                    if (obj.success == 'false') {
+                        $('#message').hide();
+                        $('#message').html('');
+                        $('#submitBtn').attr('disabled', false);
+                    }
+                }
+            });
+            return false;
+        });
+    });
     $("#cancelBtn").click(function() {
         location.href = "<?php echo $this->Url->build(["controller" => "businessDomains", "action" => "index"]); ?>";
     });

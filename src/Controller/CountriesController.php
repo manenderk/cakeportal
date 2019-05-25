@@ -53,8 +53,7 @@ class CountriesController extends AppController
      */
     public function view($id = null)
     {
-        $country = $this->Countries->get($id, [
-            //'contain' => ['JobRequirements', 'States']        // TODO Add JobRequirements and States
+        $country = $this->Countries->get($id, [            
             'contain' => []
         ]);
         $this->set('country', $country);
@@ -70,7 +69,7 @@ class CountriesController extends AppController
     {
         $country = $this->Countries->newEntity();
         if ($this->request->is('post')) {
-            $country = $this->Countries->patchEntity($country, $this->request->data);
+            $country = $this->Countries->patchEntity($country, $this->request->getData());
             $country['created_by'] = $this->Auth->user('id');
             if ($this->Countries->save($country)) {
                 $this->Flash->success('The country has been saved.');
@@ -96,7 +95,7 @@ class CountriesController extends AppController
             'contain' => []
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $country = $this->Countries->patchEntity($country, $this->request->data);
+            $country = $this->Countries->patchEntity($country, $this->request->getData());
             $country['modified_by'] = $this->Auth->user('id');
             if ($this->Countries->save($country)) {
                 $this->Flash->success('The country has been saved.');
