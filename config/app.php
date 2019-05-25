@@ -156,8 +156,7 @@ return [
      * - `trace` - boolean - Whether or not backtraces should be included in
      *   logged errors/exceptions.
      * - `log` - boolean - Whether or not you want exceptions logged.
-     * - `exceptionRenderer` - strin	
-manender.kumar@mamsys.comg - The class responsible for rendering
+     * - `exceptionRenderer` - string - The class responsible for rendering
      *   uncaught exceptions. If you choose a custom class you should place
      *   the file for that class in src/Error. This class needs to implement a
      *   render method.
@@ -342,7 +341,7 @@ manender.kumar@mamsys.comg - The class responsible for rendering
          * Database connection for ATS
          */
 
-         'atms' => [
+        'atms' => [
             'className' => 'Cake\Database\Connection',
             'driver' => 'Cake\Database\Driver\Mysql',
             'persistent' => false,

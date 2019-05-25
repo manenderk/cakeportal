@@ -96,6 +96,7 @@ class BusinessDomainsController extends AppController
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $businessDomain = $this->BusinessDomains->patchEntity($businessDomain, $this->request->getData());
+            $businessDomain['modified_by'] = $this->Auth->user('id');
             if ($this->BusinessDomains->save($businessDomain)) {
                 $this->Flash->success(__('The business domain has been saved.'));
 

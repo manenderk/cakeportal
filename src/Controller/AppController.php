@@ -67,8 +67,10 @@ class AppController extends Controller
         $currentUserId = $this->Auth->user('id');
         //LOAD ACL COMPONENT
         $this->loadComponent('AccessControl');
-
-        if ($this->request->getSession()->read('Auth.User.id')!='') {
+        //IF USER IS ALLOWED TO ACCESS REQUESTED RESOURCE
+        //var_dump($this->AccessControl->isAllowed($currentUserId));
+        
+        if ($currentUserId!='') {
             
             /*$this->loadComponent('Notification');
             $this->loadComponent('Todo');
@@ -84,8 +86,7 @@ class AppController extends Controller
             $this->set('more', $moreNotification = []);
         }
 
-        //IF USER IS ALLOWED TO ACCESS REQUESTED RESOURCE
-        //var_dump($this->AccessControl->isAllowed($currentUserId));
+        
         /*
          * Enable the following component for recommended CakePHP security settings.
          * see https://book.cakephp.org/3.0/en/controllers/components/security.html

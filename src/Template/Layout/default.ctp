@@ -153,7 +153,7 @@ if (isset($_GET['keywords']) && $_GET['keywords']!='') {
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a
-                                        href="<?php echo $this->Url->build(["controller" => "users", "action" => "myprofile", $this->Session->read('Auth.User.id')]) ?>">Profile</a>
+                                        href="<?php echo $this->Url->build(["controller" => "users", "action" => "myprofile", $this->request->getSession()->read('Auth.User.id')]) ?>">Profile</a>
                                 </li>
                                 <li><a
                                         href="<?php echo $this->Url->build(["controller" => "notifications", "action" => "index"]); ?>">My
@@ -318,14 +318,14 @@ if (isset($_GET['keywords']) && $_GET['keywords']!='') {
                             <ul id="profile" class="nav sidebar-subnav collapse">
                                 <li class="sidebar-subnav-header">Profile</li>
                                 <li>
-                                    <a href="<?=$this->Url->build(["controller" => "Users","action" => "myprofile",$_SESSION['Auth']['User']['id']]);?>"
+                                    <a href="<?=$this->Url->build(["controller" => "Users","action" => "myprofile",$this->request->getSession()->read('Auth.User.id')]);?>"
                                         title="My Profile">
                                         <em class="fa fa-user"></em>
                                         <span data-localize="sidebar.nav.Profile">My Profile</span>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="<?=$this->Url->build(["controller" => "Users","action" => "edit",$_SESSION['Auth']['User']['id']]);?>"
+                                    <a href="<?=$this->Url->build(["controller" => "Users","action" => "edit",$this->request->getSession()->read('Auth.User.id')]);?>"
                                         title="Edit Profile">
                                         <em class="fa fa-user"></em>
                                         <span data-localize="sidebar.nav.Profile">Edit Profile</span>

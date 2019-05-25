@@ -4,23 +4,60 @@
  * @var \App\Model\Entity\BusinessDomain $businessDomain
  */
 ?>
-<nav class="large-3 medium-4 columns" id="actions-sidebar">
-    <ul class="side-nav">
-        <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('List Business Domains'), ['action' => 'index']) ?></li>
-    </ul>
-</nav>
-<div class="businessDomains form large-9 medium-8 columns content">
-    <?= $this->Form->create($businessDomain) ?>
-    <fieldset>
-        <legend><?= __('Add Business Domain') ?></legend>
-        <?php
-            echo $this->Form->control('name');
-            echo $this->Form->control('description');
-            echo $this->Form->control('created_by');
-            echo $this->Form->control('modified_by');
-        ?>
-    </fieldset>
-    <?= $this->Form->button(__('Submit')) ?>
-    <?= $this->Form->end() ?>
+<div class="row">
+    <div class="col-md-12">
+        <div class="page-title">BUSINESS DOMAIN <small>Add Business Domain</small>
+            <span class="pull-right short-ico">
+                <a href="<?php echo $_SERVER["HTTP_REFERER"]; ?>">
+                    <button type="button" class="btn btn-labeled btn-default">
+                        <span class="btn-label"><i class="fa fa-hand-o-left"></i>
+                        </span>Back</button>
+                </a>
+                <a id="cancelBtn" title="Cancel">
+                    <button type="button" class="btn btn-labeled btn-default">
+                        <span class="btn-label"><i class="fa fa-close"></i>
+                        </span>Close</button>
+                </a>
+            </span>
+        </div>
+    </div>
 </div>
+
+
+
+<?= $this->Form->create($businessDomain, ['id' => 'BusinessDomain']); ?>
+<div class="wrapper bg-white atsborder">
+    <div class="panel-body">
+        <div class="row form-group">
+            <div class="col-lg-12 col-sm-12 col-md-9 col-xs-12">
+                <label class="control-label text-center">Business Domain</label>
+                <?php echo $this->Form->control('name', ['label' => false, 'placeholder' => 'Enter Business Domain', 'class' => 'form-control bg-gray']); ?>
+                <span id='message'></span>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-lg-12 col-sm-12 col-md-9 col-xs-12">
+                <label class="control-label text-center">Description</label>
+                <?php echo $this->Form->control('description', ['type' => 'textarea', 'label' => false, 'placeholder' => 'Enter Business Domain Description', 'class' => 'form-control bg-gray']); ?>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class=" col-lg-12 col-sm-12">
+                <button class="btn btn-labeled btn-success pull-right" type="submit" id="submitBtn" title="Click here to save this business domain" data-toggle="tooltip" data-placement="bottom">
+                    <i class="fa fa-hdd-o" aria-hidden="true"></i> Save</button>
+                <span id="valid-msg"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<?= $this->Form->end() ?>
+<script>
+    $("#cancelBtn").click(function() {
+        location.href = "<?php echo $this->Url->build(["controller" => "businessDomains", "action" => "index"]); ?>";
+    });
+    $('#BusinessDomain').submit(function() {
+        $('#submitBtn').attr("disabled", true);
+        $('#valid-msg').html('Wait...');
+
+    });
+</script>
