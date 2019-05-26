@@ -127,20 +127,23 @@ class BusinessDomainsController extends AppController
         return $this->redirect(['action' => 'index']);
     } */
 
-    public function check_domain_name($id = null) {
-        $domain_name = $this->request->getData('name');
-        if ($id != '') {
-            $domainName = $this->BusinessDomains->find('all')->select(['name'])->where(['name' => $domain_name, 'NOT' => array('id' => $id)]);
-        } else {
-            $domainName = $this->BusinessDomains->find('all')->select(['name'])->where(['name' => $domain_name]);
+    //FUNCTION TO CHECK IF THE PROVIDED BUSINESS DOMAIN NAME EXISTS OR NOT
+    public function checkDomainName($id = null) {
+        if ($this->request->is('ajax')) {
+            $domain_name = $this->request->getData('name');
+            if ($id != '') {
+                $domainName = $this->BusinessDomains->find('all')->select(['name'])->where(['name' => $domain_name, 'NOT' => array('id' => $id)]);
+            } else {
+                $domainName = $this->BusinessDomains->find('all')->select(['name'])->where(['name' => $domain_name]);
+            }
+            $domainArr = $domainName->toArray();
+            if (count($domainArr) > 0) {
+                $dataArr['success'] = 'true';
+            } else {
+                $dataArr['success'] = 'false';
+            }
+            echo json_encode($dataArr);            
         }
-        $domainArr = $domainName->toArray();
-        if (count($domainArr) > 0) {
-            $dataArr['success'] = 'true';
-        } else {
-            $dataArr['success'] = 'false';
-        }
-        echo json_encode($dataArr);
         exit;
     }
 }

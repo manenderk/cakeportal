@@ -52,18 +52,18 @@
 </div>
 <?= $this->Form->end() ?>
 <script>
-    // TODO: Add CSRF THIS IS NOT COMPLETE ALSO NEEDED TO DO SAME THING IN EDIT.CTP
     $(document).ready(function() {
         $("#name").blur(function() {
             var domain_name = $("#name").val();
             var dataString = 'name=' + domain_name;
-            // AJAX Code To Submit Form.
-            var url = "<?= $this->Url->build(["controller" => "BusinessDomains", "action" => "check_domain_name"]); ?>";
             $('#message').show();
             $('#message').html("<img src='/img/loading.gif'>&nbsp;&nbsp;<span style='font-weight: bold;font-size:12px;'>Checking domain name....</span>");
             $.ajax({
                 type: "POST",
                 url: "<?= $this->Url->build(["controller" => "BusinessDomains", "action" => "check_domain_name"]); ?>",
+                headers: {
+                    'X-CSRF-Token' : <?= json_encode($this->request->getParam('_csrfToken')) ?>
+                },
                 data: dataString,
                 cache: false,
                 success: function(result) {

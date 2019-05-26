@@ -50,6 +50,39 @@
 
 <?= $this->Form->end() ?>
 <script>
+    $(document).ready(function() {
+        $("#name").blur(function() {
+            var domain_name = $("#name").val();
+            var dataString = 'name=' + domain_name;
+            var url = "<?= $this->Url->build(["controller" => "BusinessDomains", "action" => "check-domain-name", $businessDomain->id]); ?>";
+            $('#message').show();
+            $('#message').html("<img src='/img/loading.gif'>&nbsp;&nbsp;<span style='font-weight: bold;font-size:12px;'>Checking domain name....</span>");
+            $.ajax({
+                type: "POST",
+                url: "<?= $this->Url->build(["controller" => "BusinessDomains", "action" => "check_domain_name", $businessDomain->id]); ?>",
+                data: dataString,
+                cache: false,
+                headers: {
+                    'X-CSRF-Token' : <?= json_encode($this->request->getParam('_csrfToken')) ?>
+                },
+                success: function(result) {
+                    var obj = $.parseJSON(result);
+                    if (obj.success == 'true') {
+                        $('#message').show();
+                        $('#message').html('Business Domain name already exist! Please try another');
+                        $('#message').css("color", "red");
+                        $('#submitBtn').attr('disabled', true);
+                    }
+                    if (obj.success == 'false') {
+                        $('#message').hide();
+                        $('#message').html('');
+                        $('#submitBtn').attr('disabled', false);
+                    }
+                }
+            });
+            return false;
+        });
+    });
     $("#cancelBtn").click(function() {
         location.href = "<?php echo $this->Url->build(["controller" => "businessDomains", "action" => "index"]); ?>";
     });
