@@ -128,6 +128,7 @@ class CountriesController extends AppController
         return $this->redirect(['action' => 'index']);
     } */
 
+    // REFERENCE BUSINESS DOMAIN MODULE TO ADD THEM
     public function check_country_name($id = null)
     {
         $country_name = $this->request->getData('name');
