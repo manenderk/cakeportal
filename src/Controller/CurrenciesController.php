@@ -69,6 +69,7 @@ class CurrenciesController extends AppController
         $currency = $this->Currencies->newEntity();
         if ($this->request->is('post')) {
             $currency = $this->Currencies->patchEntity($currency, $this->request->getData());
+            $currency['created_by'] = $this->Auth->user('id');
             if ($this->Currencies->save($currency)) {
                 $this->Flash->success(__('The currency has been saved.'));
 
@@ -77,6 +78,7 @@ class CurrenciesController extends AppController
             $this->Flash->error(__('The currency could not be saved. Please, try again.'));
         }
         $this->set(compact('currency'));
+        $this->set('_serialize', ['currency']);
     }
 
     /**
@@ -93,6 +95,7 @@ class CurrenciesController extends AppController
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $currency = $this->Currencies->patchEntity($currency, $this->request->getData());
+            $currency['modified_by'] = $this->Auth->user('id');
             if ($this->Currencies->save($currency)) {
                 $this->Flash->success(__('The currency has been saved.'));
 
@@ -101,6 +104,7 @@ class CurrenciesController extends AppController
             $this->Flash->error(__('The currency could not be saved. Please, try again.'));
         }
         $this->set(compact('currency'));
+        $this->set('_serialize', ['currency']);
     }
 
     /**
@@ -110,7 +114,7 @@ class CurrenciesController extends AppController
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    /* public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
         $currency = $this->Currencies->get($id);
@@ -121,5 +125,22 @@ class CurrenciesController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    } */
+
+    public function checkCurrencyName($id = null) {
+        $currency_name = $this->request->getData('name');
+        if ($id != '') {
+            $currencyName = $this->Currencies->find('all')->select(['name'])->where(['name' => $currency_name, 'NOT' => array('id' => $id)]);
+        } else {
+            $currencyName = $this->Currencies->find('all')->select(['name'])->where(['name' => $currency_name]);
+        }
+        $currencyArr = $currencyName->toArray();
+        if (count($currencyArr) > 0) {
+            $dataArr['success'] = 'true';
+        } else {
+            $dataArr['success'] = 'false';
+        }
+        echo json_encode($dataArr);
+        exit;
     }
 }
