@@ -80,7 +80,6 @@
                 <span>
                     <div class="rTableCell">
                         <?= $country->is_active == 1 ? 'Active' : 'Inactive' ?>
-
                     </div>
                 </span>
                 <!-- TODO: ACL - SHOW ONLY WHEN USER HAS WRITE ACCESS -->
