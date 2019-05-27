@@ -605,7 +605,7 @@ if (isset($_GET['keywords']) && $_GET['keywords']!='') {
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="<?=$this->Url->build(["controller" => "profileSource","action" => "index"]);?>"
+                                    <a href="<?=$this->Url->build(["controller" => "profileSources","action" => "index"]);?>"
                                         title="Profile Source">
                                         <em class="fa fa-list"></em>
                                         <span data-localize="sidebar.nav.element.BUTTON">Profile Source</span>
