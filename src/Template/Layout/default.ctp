@@ -632,6 +632,7 @@ if (isset($_GET['keywords']) && $_GET['keywords']!='') {
                                         <span data-localize="sidebar.nav.element.BUTTON">Status Code</span>
                                     </a>
                                 </li>
+                                <!-- TODO: REPLACE THIS MODULE WITH NEW ACL -->
                                 <li>
                                     <a href="<?=$this->Url->build(["controller" => "userRoles","action" => "index"]);?>"
                                         title="User Roles">
@@ -639,6 +640,7 @@ if (isset($_GET['keywords']) && $_GET['keywords']!='') {
                                         <span data-localize="sidebar.nav.element.BUTTON">User Roles</span>
                                     </a>
                                 </li>
+                                <!-- TODO: REPLACE THIS MODULE WITH GROUPS -->
                                 <li>
                                     <a href="<?=$this->Url->build(["controller" => "userTypes","action" => "index"]);?>"
                                         title="Use Type">
@@ -647,7 +649,7 @@ if (isset($_GET['keywords']) && $_GET['keywords']!='') {
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="<?=$this->Url->build(["controller" => "visa","action" => "index"]);?>"
+                                    <a href="<?=$this->Url->build(["controller" => "visas","action" => "index"]);?>"
                                         title="Visa">
                                         <em class="fa fa-list"></em>
                                         <span data-localize="sidebar.nav.element.BUTTON">Visa</span>
