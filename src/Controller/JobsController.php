@@ -98,9 +98,9 @@ class JobsController extends AppController
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $job = $this->Jobs->patchEntity($job, $this->request->getData());
+            $job['modified_by'] = $this->Auth->user('id');
             if ($this->Jobs->save($job)) {
                 $this->Flash->success(__('The job has been saved.'));
-
                 return $this->redirect(['action' => 'index']);
             }
             $this->Flash->error(__('The job could not be saved. Please, try again.'));
