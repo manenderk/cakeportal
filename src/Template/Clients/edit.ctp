@@ -41,7 +41,7 @@
                 <div class="row form-group">
                     <label class="col-lg-3 col-md-3 col-sm-3 col-xs-12 control-label">Email</label>
                     <div class="col-lg-8 col-xs-12 col-sm-9">
-                        <?php echo $this->Form->control('email', ['label'=>false, 'type'=>'text','placeholder'=>'Enter name','class' => 'input-sm form-control bg-gray']); ?>
+                        <?php echo $this->Form->control('email', ['label'=>false, 'type'=>'text','placeholder'=>'Enter email','class' => 'input-sm form-control bg-gray']); ?>
                     </div>
                 </div>
                 <div class="row form-group">
@@ -53,7 +53,7 @@
                 <div class="row form-group">
                     <label class="col-lg-3 col-md-3 col-sm-3 col-xs-12 control-label">Contract Expiry Date</label>
                     <div class="col-lg-8 col-xs-12 col-sm-9">
-                        <?php echo $this->Form->control('contract_expiry_date', array('type' => 'text', 'label'=>false,'empty' => true, 'default' => '','placeholder'=>'Contract Expiry Date','class'=>'input-sm form-control bg-gray'));?>
+                        <?php echo $this->Form->control('contract_expiry_date', array('type' => 'text', 'label'=>false,'empty' => true, 'default' => '','placeholder'=>'Contract Expiry Date','class'=>'input-sm form-control bg-gray', 'value' => $client->contract_expiry_date->i18nFormat('yyyy-MM-dd')));?>
                     </div>
                 </div>
                 <div class="row form-group">
@@ -177,11 +177,8 @@
         location.href =
             "<?php echo $this->Url->build(["controller" => "clients","action" => "index"]);?>";
     });
-    var selectedDate = new Date($('#contract-expiry-date').val());
-    //$('#contract-expiry-date').val(selectedDate.getFullYear() + '-' + selectedDate.getMonth() + '-' + selectedDate.getDate());
     var expiryDate = $('#contract-expiry-date').datepicker({
-        format: 'yyyy-mm-dd'
+        format: 'yyyy-mm-dd',
     });
-    expiryDate.setValue(selectedDate.getFullYear() + '-' + selectedDate.getMonth() + '-' + selectedDate.getDate());
     
 </script>

@@ -22,7 +22,7 @@ class UsersController extends AppController
         parent::initialize();
         $this->Groups = TableRegistry::getTableLocator()->get('Groups');
         $this->UserGroups = TableRegistry::getTableLocator()->get('UserGroups');
-        $this->Auth->allow(['logout']);
+        $this->Auth->allow(['login', 'logout']);
     }
     /**
      * Index method

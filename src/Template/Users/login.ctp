@@ -87,7 +87,7 @@
             );
             $.ajax({
                 type: "POST",
-                url: "login",
+                url: "<?= $this->Url->build('/users/login/') ?>",
                 data: dataString,
                 cache: false,
                 success: function(result) {
