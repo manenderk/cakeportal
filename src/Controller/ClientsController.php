@@ -43,6 +43,8 @@ class ClientsController extends AppController
         $this->set('_serialize', ['clients']);
     }
 
+    
+
     /**
      * View method
      *
@@ -70,10 +72,15 @@ class ClientsController extends AppController
         $client = $this->Clients->newEntity();
         if ($this->request->is('post')) {
             $client = $this->Clients->patchEntity($client, $this->request->getData());
+            $client['created_by'] = $this->Auth->user('id');
             if ($this->Clients->save($client)) {
                 $this->Flash->success(__('The client has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
+            }
+            else{
+                debug($client->errors());
+                exit;
             }
             $this->Flash->error(__('The client could not be saved. Please, try again.'));
         }

@@ -37,6 +37,16 @@ class ClientsTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+
+        $this->addBehavior('Josegonzalez/Upload.Upload', [
+            'client_logo' => [
+                'path' => 'webroot{DS}img{DS}client-logo',
+                'nameCallback' => function ($table, $entity, $data, $field, $settings) {
+                    return time().$data['name'];
+                },
+                'keepFilesOnDelete' => false
+            ]
+        ]);
     }
 
     /**
@@ -87,17 +97,15 @@ class ClientsTable extends Table
             ->allowEmptyDate('contract_expiry_date');
 
         $validator
-            ->scalar('client_logo')
             ->maxLength('client_logo', 255)
             ->allowEmptyString('client_logo');
 
         $validator
-            ->requirePresence('created_by', 'create')
-            ->allowEmptyString('created_by', false);
+            ->allowEmptyString('created_by');
 
         $validator
-            ->requirePresence('modified_by', 'create')
-            ->allowEmptyString('modified_by', false);
+            ->allowEmptyString('modified_by');
+
 
         return $validator;
     }

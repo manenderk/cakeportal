@@ -36,6 +36,7 @@
     <?= $this->Html->css('theme-f.css') ?>
     <?= $this->Html->css('theme-g.css') ?>
     <?= $this->Html->css('theme-h.css') ?>
+    <?= $this->Html->css('datepicker.css') ?>
     <?= $this->Html->script('jquery-1-10-2.min'); ?>
     <?= $this->Html->script('jquery.infinitescroll.min'); ?>
     <?= $this->Html->script('jquery_ui'); ?>
@@ -59,6 +60,7 @@
     <?= $this->Html->script('jquery.classyloader.min'); ?>
     <?= $this->Html->script('moment-with-locales.min'); ?>
     <?= $this->Html->script('skycons'); ?>
+    <?= $this->Html->script('bootstrap-datepicker'); ?>
     <?= $this->Html->script('custom.js'); ?>
     <?= $this->Html->script('app'); ?>
     <?= $this->Html->script('jquery.gmap.min'); ?>
