@@ -59,10 +59,12 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
     public function add()
-    {
+    {        
         //CREATE NEW USER ENTITY
         $user = $this->Users->newEntity();
         if ($this->request->is('post')) {
+            var_dump($this->request->getData('userGroups'));
+            exit;
             //LOAD NEW USER ENTITY WITH POST DATA
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($result = $this->Users->save($user)) {
