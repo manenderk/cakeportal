@@ -214,9 +214,27 @@ class UsersController extends AppController
         }
     }
 
-    public function logout() {
+    public function logout()
+    {
         $this->layout = 'logout';
         $this->Flash->success('You are now logged out.');
         return $this->redirect($this->Auth->logout());
+    }
+
+    public function checkEmail($id=null)
+    {
+        $email = $this->request->getData('email');
+        if ($id != '') {
+            $users = $this->Users->find('all')->where(['email' => $email, 'NOT' => ['id' => $id]])->count();
+        } else {
+            $users = $this->Users->find('all')->where(['email' => $email])->count();
+        }
+        if ($users > 0) {
+            $dataArr['success'] = 'true';
+        } else {
+            $dataArr['success'] = 'false';
+        }
+        echo json_encode($dataArr);
+        exit;
     }
 }

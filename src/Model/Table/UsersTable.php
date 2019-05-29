@@ -37,6 +37,17 @@ class UsersTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+
+        $this->addBehavior('Josegonzalez/Upload.Upload', [
+            'profile_pic' => [
+                'path' => 'webroot{DS}img{DS}user-profile-pic',
+                'nameCallback' => function ($table, $entity, $data, $field, $settings) {
+                    return time().$data['name'];
+                },
+                'keepFilesOnDelete' => false
+            ]
+        ]);
+
     }
 
     /**
@@ -92,9 +103,9 @@ class UsersTable extends Table
             ->allowEmptyString('contact_number', false);
 
         $validator
-            ->scalar('profile_pic')
             ->maxLength('profile_pic', 255)
-            ->allowEmptyFile('profile_pic');
+            ->allowEmptyString('profile_pic');
+
 
         $validator
             ->boolean('is_active')
