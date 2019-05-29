@@ -19,7 +19,7 @@ class UserFunctionsHelper extends Helper
 
     public $helpers = ['Html'];
 
-    public function getUserDisplayNameWithLink($userId)
+    public function getUserDisplayNameWithLink($userId = null)
     {
         if (empty($userId)) {
             return '';
@@ -27,5 +27,13 @@ class UserFunctionsHelper extends Helper
         $Users = TableRegistry::getTableLocator()->get('Users');
         $user = $Users->get($userId);        
         return $this->Html->link($user->first_name . " " . $user->middle_name . " " . $user->last_name, ['controller' => 'Users', 'action' => 'view', $userId]);
+    }
+    public function getUserDetails($id = null){
+        $user = [];
+        if(!empty($id)){
+            $Users = TableRegistry::getTableLocator()->get('Users');
+            $user = $Users->get($id)->toArray();
+        }
+        return $user;
     }
 }

@@ -28,32 +28,28 @@ class ClientContactsController extends AppController
      */
     public function index()
     {
-        /* $condition = array();
-        if ($this->request->is('post')) {
+        $condition = array();
+         if ($this->request->is('post')) {
             if ($this->request->data['client_id'] != '') {
-                $limit = 500;
                 $condition['Clients.id'] = $this->request->data['client_id'];
             }
             
-            if ($this->request->data['login_name'] != '') {
+            /* if ($this->request->data['login_name'] != '') {
                 $limit = 500;
                 $condition['Users.login_name LIKE'] = '%' . @$_POST['login_name'] . '%';
             }
             if ($this->request->data['contact_number'] != '') {
                 $limit = 500;
                 $condition['Users.contact_number LIKE'] = '%' . @$_POST['contact_number'] . '%';
-            }
+            } */
         }
         $this->paginate = [
             'contain' => ['Clients'],
-            'Users' => $this->Users->find(),
             'conditions' => $condition
         ];
-        $clients = $this->ClientContacts->Clients->find('list'); */
-        $query = $this->ClientContacts->find('all')->leftJoinWith($this->Users, function($q){
-            return $q->where([]);
-        });
-        $this->set('clientContacts', $this->paginate($query));
+        $this->set('clientContacts', $this->paginate($this->ClientContacts));
+        
+        $clients = $this->ClientContacts->Clients->find('list');
         $this->set('clients', $clients);
         $this->set('_serialize', ['clientContacts']);
     }

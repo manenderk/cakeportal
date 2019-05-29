@@ -27,7 +27,7 @@
 
 <div class="row">
     <div class="panel-body user-seabx">
-        <?php echo $this->Form->create('ClientManager', array('role'=>'form','class'=>'form-inline','action' =>'/index')); ?>
+        <?php echo $this->Form->create('ClientManager', ['role'=>'form','class'=>'form-inline', 'url' => ['action' =>'index']]); ?>
         <div class="col-lg-5 col-md-5 text-center col-xs-12 col-sm-5">
             <?php echo $this->Form->control('client_id', ['options' => $clients,'class'=>'input-sm atsborder form-control','empty'=>'Select client','label'=>false]); ?>
         </div>
@@ -54,52 +54,49 @@
                     <th>Picture</th>
                     <th><?php echo $this->Paginator->sort('client') ?>
                     </th>
-                    <th><?php echo $this->Paginator->sort('login_name') ?>
+                    <th>Client Manager
                     </th>
-                    <th><?php echo $this->Paginator->sort('first_name') ?>
+                    <th>Email
+                    </th>                    
+                    <th>Contact Number
                     </th>
-                    <th><?php echo $this->Paginator->sort('middle_name') ?>
-                    </th>
-                    <th><?php echo $this->Paginator->sort('last_name') ?>
-                    </th>
-                    <th><?php echo $this->Paginator->sort('phone_number') ?>
-                    </th>
+                    <!-- TODO: HIDE THIS AS PER ACL -->
+                    <th></th>
                 </tr>
             </thead>
             <tbody id="newrow1">
-                <!-- <tr class="bg-gray-lighter">
+                <?php foreach ($clientContacts as $clientContact) : ?>
+                <?php $user = $this->UserFunctions->getUserDetails($clientContact->user_id);?>
+                <tr class="bg-gray-lighter">
                     <td>
                         <div class="media">
-                            <?php echo $this->Html->image('profile_img/'.$image, ['alt' => $clientContact->user->profile_pic]); ?>
+                            <?= $this->Html->image('user-profile-pic/'.$user['profile_pic'], ['alt' => '']); ?>
                         </div>
                     </td>
-                    <td><?= $clientContact->client->name;?>
+                    <td>
+                        <?= $clientContact->client->name ?>
                     </td>
-                    <td><a href="<?php echo $this->Url->build(["controller" => "clientContacts", "action" => "view", $clientContact->id]); ?>"
-                            title="Click here to view this client manager contact details" data-toggle="tooltip"
-                            data-placement="bottom"><?= $clientContact->user->login_name;?></a></td>
-                    <td><?=$clientContact->user->first_name;?>
+                    <td>
+                        <?= $this->UserFunctions->getUserDisplayNameWithLink($clientContact->user_id) ?>
                     </td>
-                    <td><?=$clientContact->user->middle_name;?>
+                    <td>
+                        <?= $user['email'] ?>
                     </td>
-                    <td><?=$clientContact->user->last_name;?>
+                    <td>
+                        <?= $user['contact_country_code']."-".$user['contact_number'] ?>
                     </td>
-                    <td><?=$clientContact->user->contact_number;?>
 
-                        <?php
-                // 1=>admin, 2=> Manager, 3=>Recruiter , 4=>Applicant , 5=> client , 6=> data entry operator
-                if (in_array($_SESSION['Auth']['User']['user_role_id'], array(1,2,8))) { ?>
+                    <!-- TODO: HIDE THIS AS PER ACL  -->
+                    <td>
                         <a
                             href="<?php echo $this->Url->build(["controller" => "clientContacts", "action" => "edit",$clientContact->id]); ?>">
                             <em class="fa fa-pencil-square-o pull-right faa-tada"
                                 title="Click to edit this client manager contact details" data-toggle="tooltip"
                                 data-placement="left"></em>
-                        </a> </td>
-                    <?php } ?>
-
-
-
-                </tr> -->
+                        </a> 
+                    </td>
+                </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </div>

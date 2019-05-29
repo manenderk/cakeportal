@@ -86,6 +86,9 @@ class AppController extends Controller
             $this->set('more', $moreNotification = []);
         }
 
+        if(empty($_SERVER['HTTP_REFERER'])){
+            $_SERVER['HTTP_REFERER'] = '';
+        }
         
         /*
          * Enable the following component for recommended CakePHP security settings.
