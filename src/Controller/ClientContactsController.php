@@ -28,27 +28,46 @@ class ClientContactsController extends AppController
      */
     public function index()
     {
-        $condition = array();
          if ($this->request->is('post')) {
-            if ($this->request->data['client_id'] != '') {
-                $condition['Clients.id'] = $this->request->data['client_id'];
+            $clientId = '';
+            if (!empty($this->request->getData('client_id'))) {
+                $clientId = $this->request->data['client_id'];
             }
-            
-            /* if ($this->request->data['login_name'] != '') {
-                $limit = 500;
-                $condition['Users.login_name LIKE'] = '%' . @$_POST['login_name'] . '%';
+            $usersId = [];
+            if (!empty($this->request->getData('email'))) {
+                $users = $this->Users->find('all')->select('id')->where(['email LIKE'=>"%".$this->request->getData('email')."%"]);
+                foreach($users as $user){
+                    $usersId[] = $user->id;
+                }
             }
-            if ($this->request->data['contact_number'] != '') {
-                $limit = 500;
-                $condition['Users.contact_number LIKE'] = '%' . @$_POST['contact_number'] . '%';
-            } */
+            if (!empty($this->request->getData('contact_number'))) {
+                $users = $this->Users->find('all')->select('id')->where(['contact_number LIKE'=>"%".$this->request->getData('contact_number')."%"]);
+                foreach ($users as $user) {
+                    $usersId[] = $user->id;
+                }
+            }
+            $usersId = array_unique($usersId);            
         }
         $this->paginate = [
-            'contain' => ['Clients'],
-            'conditions' => $condition
+            'contain' => ['Clients']
         ];
-        $this->set('clientContacts', $this->paginate($this->ClientContacts));
-        
+        if(!empty($clientId) && !empty($usersId)){
+            $query = $this->ClientContacts->find('all')->where(['client_id' => $clientId, 'user_id IN' => $usersId]);
+        }
+        else if(!empty($clientId) && empty($usersId)){
+            $query = $this->ClientContacts->find('all')->where(['client_id' => $clientId]);
+
+        }
+        else if(empty($clientId) && !empty($usersId)){
+            $query = $this->ClientContacts->find('all')->where(['user_id IN' => $usersId]);
+        }
+
+        if(isset($query)){
+            $this->set('clientContacts', $this->paginate($query));
+        }
+        else{
+            $this->set('clientContacts', $this->paginate($this->ClientContacts));
+        }        
         $clients = $this->ClientContacts->Clients->find('list');
         $this->set('clients', $clients);
         $this->set('_serialize', ['clientContacts']);
@@ -61,14 +80,14 @@ class ClientContactsController extends AppController
      * @return \Cake\Http\Response|void
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+    /* public function view($id = null)
     {
         $clientContact = $this->ClientContacts->get($id, [
             'contain' => ['Clients']
         ]);
 
         $this->set('clientContact', $clientContact);
-    }
+    } */
 
     /**
      * Add method
@@ -139,7 +158,7 @@ class ClientContactsController extends AppController
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    /* public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
         $clientContact = $this->ClientContacts->get($id);
@@ -150,5 +169,5 @@ class ClientContactsController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
-    }
+    } */
 }
