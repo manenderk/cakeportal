@@ -564,3 +564,6 @@
 
     });
 </script>
+<script>
+    $('#usergroups').multiSelect();
+</script>
