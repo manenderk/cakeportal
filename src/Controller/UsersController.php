@@ -32,9 +32,29 @@ class UsersController extends AppController
      */
     public function index()
     {
-        $users = $this->paginate($this->Users);
-
-        $this->set(compact('users'));
+        $condition = [];
+        if ($this->request->is('post')) {
+            if (!empty($this->request->getData('email'))) {
+                $condition['Users.email LIKE'] = '%' . @$this->request->getData('email') . '%';
+            }
+            if (!empty($this->request->getData('first_name'))) {
+                $condition['Users.first_name LIKE'] = '%' . @$this->request->getData('first_name') . '%';
+            }
+            if (!empty($this->request->getData('contact_number'))) {
+                $condition['Users.contact_number LIKE'] = '%' . @$this->request->getData('contact_number') . '%';
+            }
+            if (!empty($this->request->getData('is_active'))) {
+                $condition['Users.is_active'] = $this->request->getData('is_active');
+            }
+        }
+        $this->paginate = [
+            'conditions' => $condition,
+            'order' => [
+                'email' => 'asc'
+            ]
+        ];
+        $this->set('users', $this->paginate($this->Users));
+        $this->set('_serialize', ['users']);
     }
 
     /**
@@ -59,7 +79,7 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null Redirects on successful add, renders view otherwise.
      */
     public function add()
-    {        
+    {
         //CREATE NEW USER ENTITY
         $user = $this->Users->newEntity();
         if ($this->request->is('post')) {

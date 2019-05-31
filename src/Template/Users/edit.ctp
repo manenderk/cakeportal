@@ -533,7 +533,7 @@
     });
 </script>
 <script>
-    var selectedGroupIds = <?= empty($userGroupsId) ? null : json_encode($userGroupsId) ?>;
+    var selectedGroupIds = <?= empty($userGroupsId) ? json_encode([]) : json_encode($userGroupsId) ?>;
     $('#usergroups option').each(function(){        
         if(selectedGroupIds.indexOf(parseInt($(this).val())) > -1){
             $(this).prop('selected', true);
