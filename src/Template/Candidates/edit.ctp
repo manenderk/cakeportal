@@ -26,6 +26,7 @@
             echo $this->Form->control('candidate_middle_name');
             echo $this->Form->control('candidate_last_name');
             echo $this->Form->control('candidate_email');
+            echo $this->Form->control('password');
             echo $this->Form->control('candidate_alternate_email');
             echo $this->Form->control('candidate_phone');
             echo $this->Form->control('area_code1');

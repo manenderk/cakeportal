@@ -37,6 +37,24 @@ class CandidatesTable extends Table
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp');
+
+        $this->belongsTo('Currencies', [
+            'foreignKey' => 'current_salary_code',
+            'foreignKey' => 'expected_salary_code'
+        ]);
+
+        $this->belongsTo('Visas', [
+            'foreignKey' => 'visa_status'
+        ]);
+
+        $this->belongsTo('Countries', [
+            'foreignKey' => 'candidate_country'
+        ]);
+
+        $this->belongsTo('States', [
+            'foreignKey' => 'candidate_state'
+        ]);
+
     }
 
     /**
@@ -65,8 +83,7 @@ class CandidatesTable extends Table
         $validator
             ->scalar('candidate_middle_name')
             ->maxLength('candidate_middle_name', 50)
-            ->requirePresence('candidate_middle_name', 'create')
-            ->allowEmptyString('candidate_middle_name', false);
+            ->allowEmptyString('candidate_middle_name');
 
         $validator
             ->scalar('candidate_last_name')
@@ -78,13 +95,19 @@ class CandidatesTable extends Table
             ->scalar('candidate_email')
             ->maxLength('candidate_email', 100)
             ->requirePresence('candidate_email', 'create')
-            ->allowEmptyString('candidate_email', false);
+            ->allowEmptyString('candidate_email', false)
+            ->add('candidate_email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+
+        $validator
+            ->scalar('password')
+            ->maxLength('password', 255)
+            ->requirePresence('password', 'create')
+            ->allowEmptyString('password', false);
 
         $validator
             ->scalar('candidate_alternate_email')
             ->maxLength('candidate_alternate_email', 100)
-            ->requirePresence('candidate_alternate_email', 'create')
-            ->allowEmptyString('candidate_alternate_email', false);
+            ->allowEmptyString('candidate_alternate_email');
 
         $validator
             ->scalar('candidate_phone')
@@ -164,8 +187,7 @@ class CandidatesTable extends Table
         $validator
             ->scalar('contact_no_alternate')
             ->maxLength('contact_no_alternate', 12)
-            ->requirePresence('contact_no_alternate', 'create')
-            ->allowEmptyString('contact_no_alternate', false);
+            ->allowEmptyString('contact_no_alternate');
 
         $validator
             ->scalar('total_it_experience')
@@ -192,50 +214,40 @@ class CandidatesTable extends Table
         $validator
             ->scalar('current_job_title')
             ->maxLength('current_job_title', 255)
-            ->requirePresence('current_job_title', 'create')
-            ->allowEmptyString('current_job_title', false);
+            ->allowEmptyString('current_job_title');
 
         $validator
             ->scalar('current_employer')
             ->maxLength('current_employer', 100)
-            ->requirePresence('current_employer', 'create')
-            ->allowEmptyString('current_employer', false);
+            ->allowEmptyString('current_employer');
 
         $validator
             ->scalar('expected_salary')
             ->maxLength('expected_salary', 100)
-            ->requirePresence('expected_salary', 'create')
-            ->allowEmptyString('expected_salary', false);
+            ->allowEmptyString('expected_salary');
 
         $validator
             ->scalar('current_salary')
             ->maxLength('current_salary', 100)
-            ->requirePresence('current_salary', 'create')
-            ->allowEmptyString('current_salary', false);
+            ->allowEmptyString('current_salary');
 
         $validator
-            ->scalar('current_salary_code')
-            ->maxLength('current_salary_code', 4)
-            ->requirePresence('current_salary_code', 'create')
-            ->allowEmptyString('current_salary_code', false);
+            ->nonNegativeInteger('current_salary_code')
+            ->allowEmptyString('current_salary_code');
 
         $validator
-            ->scalar('expected_salary_code')
-            ->maxLength('expected_salary_code', 4)
-            ->requirePresence('expected_salary_code', 'create')
-            ->allowEmptyString('expected_salary_code', false);
+            ->nonNegativeInteger('expected_salary_code')
+            ->allowEmptyString('expected_salary_code');
 
         $validator
             ->scalar('twitterid')
             ->maxLength('twitterid', 100)
-            ->requirePresence('twitterid', 'create')
-            ->allowEmptyString('twitterid', false);
+            ->allowEmptyString('twitterid');
 
         $validator
             ->scalar('skypeid')
             ->maxLength('skypeid', 100)
-            ->requirePresence('skypeid', 'create')
-            ->allowEmptyString('skypeid', false);
+            ->allowEmptyString('skypeid');
 
         $validator
             ->scalar('candidate_description')
@@ -251,32 +263,39 @@ class CandidatesTable extends Table
         $validator
             ->scalar('cover_letter')
             ->maxLength('cover_letter', 255)
-            ->requirePresence('cover_letter', 'create')
-            ->allowEmptyString('cover_letter', false);
+            ->allowEmptyString('cover_letter');
 
         $validator
             ->scalar('other_files')
             ->maxLength('other_files', 255)
-            ->requirePresence('other_files', 'create')
-            ->allowEmptyFile('other_files', false);
+            ->allowEmptyFile('other_files');
 
         $validator
             ->scalar('profile_pic')
             ->maxLength('profile_pic', 200)
-            ->requirePresence('profile_pic', 'create')
-            ->allowEmptyFile('profile_pic', false);
+            ->allowEmptyFile('profile_pic');
 
         $validator
-            ->integer('candidate_submitted_by')
-            ->requirePresence('candidate_submitted_by', 'create')
-            ->allowEmptyString('candidate_submitted_by', false);
+            ->allowEmptyString('candidate_submitted_by');
 
         $validator
-            ->integer('candidate_modified_by')
-            ->requirePresence('candidate_modified_by', 'create')
-            ->allowEmptyString('candidate_modified_by', false);
+            ->allowEmptyString('candidate_modified_by');
 
         return $validator;
+    }
+
+    /**
+     * Returns a rules checker object that will be used for validating
+     * application integrity.
+     *
+     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
+     * @return \Cake\ORM\RulesChecker
+     */
+    public function buildRules(RulesChecker $rules)
+    {
+        $rules->add($rules->isUnique(['candidate_email']));
+
+        return $rules;
     }
 
     /**

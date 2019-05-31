@@ -9,10 +9,11 @@ use Cake\ORM\Entity;
  * @property int $id
  * @property string $salutation
  * @property string $candidate_first_name
- * @property string $candidate_middle_name
+ * @property string|null $candidate_middle_name
  * @property string $candidate_last_name
  * @property string $candidate_email
- * @property string $candidate_alternate_email
+ * @property string $password
+ * @property string|null $candidate_alternate_email
  * @property string $candidate_phone
  * @property string|null $area_code1
  * @property string|null $area_code2
@@ -27,28 +28,28 @@ use Cake\ORM\Entity;
  * @property string $candidate_state
  * @property int|null $candidate_country
  * @property string $candidate_zipcode
- * @property string $contact_no_alternate
+ * @property string|null $contact_no_alternate
  * @property string $total_it_experience
  * @property string $total_overall_experience
  * @property string $key_skills
  * @property string $specialization
- * @property string $current_job_title
- * @property string $current_employer
- * @property string $expected_salary
- * @property string $current_salary
- * @property string $current_salary_code
- * @property string $expected_salary_code
- * @property string $twitterid
- * @property string $skypeid
+ * @property string|null $current_job_title
+ * @property string|null $current_employer
+ * @property string|null $expected_salary
+ * @property string|null $current_salary
+ * @property int|null $current_salary_code
+ * @property int|null $expected_salary_code
+ * @property string|null $twitterid
+ * @property string|null $skypeid
  * @property string $candidate_description
  * @property string $resume
- * @property string $cover_letter
- * @property string $other_files
- * @property string $profile_pic
+ * @property string|null $cover_letter
+ * @property string|null $other_files
+ * @property string|null $profile_pic
  * @property \Cake\I18n\FrozenTime $created
  * @property \Cake\I18n\FrozenTime|null $modified
- * @property int $candidate_submitted_by
- * @property int $candidate_modified_by
+ * @property int|null $candidate_submitted_by
+ * @property int|null $candidate_modified_by
  */
 class Candidate extends Entity
 {
@@ -67,6 +68,7 @@ class Candidate extends Entity
         'candidate_middle_name' => true,
         'candidate_last_name' => true,
         'candidate_email' => true,
+        'password' => true,
         'candidate_alternate_email' => true,
         'candidate_phone' => true,
         'area_code1' => true,
@@ -104,5 +106,14 @@ class Candidate extends Entity
         'modified' => true,
         'candidate_submitted_by' => true,
         'candidate_modified_by' => true
+    ];
+
+    /**
+     * Fields that are excluded from JSON versions of the entity.
+     *
+     * @var array
+     */
+    protected $_hidden = [
+        'password'
     ];
 }

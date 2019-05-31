@@ -21,6 +21,7 @@
                 <th scope="col"><?= $this->Paginator->sort('candidate_middle_name') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('candidate_last_name') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('candidate_email') ?></th>
+                <th scope="col"><?= $this->Paginator->sort('password') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('candidate_alternate_email') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('candidate_phone') ?></th>
                 <th scope="col"><?= $this->Paginator->sort('area_code1') ?></th>
@@ -67,6 +68,7 @@
                 <td><?= h($candidate->candidate_middle_name) ?></td>
                 <td><?= h($candidate->candidate_last_name) ?></td>
                 <td><?= h($candidate->candidate_email) ?></td>
+                <td><?= h($candidate->password) ?></td>
                 <td><?= h($candidate->candidate_alternate_email) ?></td>
                 <td><?= h($candidate->candidate_phone) ?></td>
                 <td><?= h($candidate->area_code1) ?></td>
@@ -89,8 +91,8 @@
                 <td><?= h($candidate->current_employer) ?></td>
                 <td><?= h($candidate->expected_salary) ?></td>
                 <td><?= h($candidate->current_salary) ?></td>
-                <td><?= h($candidate->current_salary_code) ?></td>
-                <td><?= h($candidate->expected_salary_code) ?></td>
+                <td><?= $this->Number->format($candidate->current_salary_code) ?></td>
+                <td><?= $this->Number->format($candidate->expected_salary_code) ?></td>
                 <td><?= h($candidate->twitterid) ?></td>
                 <td><?= h($candidate->skypeid) ?></td>
                 <td><?= h($candidate->resume) ?></td>

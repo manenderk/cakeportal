@@ -57,7 +57,12 @@ class CandidatesController extends AppController
             }
             $this->Flash->error(__('The candidate could not be saved. Please, try again.'));
         }
-        $this->set(compact('candidate'));
+        $currencies = $this->Candidates->Currencies->find('list');
+        $visas = $this->Candidates->Visas->find('list');
+        $countries = $this->Candidates->Countries->find('list');
+        $states = $this->Candidates->States->find('list');
+
+        $this->set(compact('candidate','currencies','visas','countries','states'));
     }
 
     /**

@@ -37,6 +37,10 @@
             <td><?= h($candidate->candidate_email) ?></td>
         </tr>
         <tr>
+            <th scope="row"><?= __('Password') ?></th>
+            <td><?= h($candidate->password) ?></td>
+        </tr>
+        <tr>
             <th scope="row"><?= __('Candidate Alternate Email') ?></th>
             <td><?= h($candidate->candidate_alternate_email) ?></td>
         </tr>
@@ -117,14 +121,6 @@
             <td><?= h($candidate->current_salary) ?></td>
         </tr>
         <tr>
-            <th scope="row"><?= __('Current Salary Code') ?></th>
-            <td><?= h($candidate->current_salary_code) ?></td>
-        </tr>
-        <tr>
-            <th scope="row"><?= __('Expected Salary Code') ?></th>
-            <td><?= h($candidate->expected_salary_code) ?></td>
-        </tr>
-        <tr>
             <th scope="row"><?= __('Twitterid') ?></th>
             <td><?= h($candidate->twitterid) ?></td>
         </tr>
@@ -159,6 +155,14 @@
         <tr>
             <th scope="row"><?= __('Candidate Country') ?></th>
             <td><?= $this->Number->format($candidate->candidate_country) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Current Salary Code') ?></th>
+            <td><?= $this->Number->format($candidate->current_salary_code) ?></td>
+        </tr>
+        <tr>
+            <th scope="row"><?= __('Expected Salary Code') ?></th>
+            <td><?= $this->Number->format($candidate->expected_salary_code) ?></td>
         </tr>
         <tr>
             <th scope="row"><?= __('Candidate Submitted By') ?></th>
