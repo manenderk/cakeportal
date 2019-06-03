@@ -731,18 +731,20 @@ for ($d=0;$d<=30;$d++) {
         var val = $('#candidate-country').val();
         $.ajax({
             type: "POST",
-            url: "<?php echo $this->Url->build(["controller" => "JobRequirements","action" => "get_states"]);?>",
-            data: 'country_id=' + val,
+            url: "<?php echo $this->Url->build(["controller" => "States","action" => "get-states-for-country"]);?>",
+            data: 'countryId=' + val,
+            headers: {
+                'X-CSRF-Token' : <?= json_encode($this->request->getParam('_csrfToken')) ?>
+            },
             success: function(data) {
-                var json = data;
                 $('#candidate-state').empty();
                 $('#load-state').html("");
                 $('#candidate-state').append(
                     "<option value=''>--Select State--</option>"
                 );
-                $.each(JSON.parse(json), function(idx, obj) {
+                $.each(JSON.parse(data), function(id, obj) {
                     $('#candidate-state').append(
-                        "<option value=" + this.id + ">" + this.name + "</option>"
+                        "<option value=" + id + ">" + obj + "</option>"
                     );
                 });
             }

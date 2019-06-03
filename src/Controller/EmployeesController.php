@@ -18,7 +18,8 @@ class EmployeesController extends AppController
     private $CustomFieldValues;
     private $CustomFieldChoices;
 
-    public function initialize(){
+    public function initialize()
+    {
         parent::initialize();
         $this->Users = TableRegistry::getTableLocator()->get('Users');
         $this->CustomFields = TableRegistry::getTableLocator()->get('CustomFields');
@@ -33,13 +34,50 @@ class EmployeesController extends AppController
      */
     public function index()
     {
+        if ($this->request->is('post')) {
+            $employeeNum = '';
+            if (!empty($this->request->getData('employee_num'))) {
+                $employeeNum = $this->request->data['employee_num'];
+            }
+            
+            $usersId = [];
+            if (!empty($this->request->getData('email'))) {
+                $users = $this->Users->find('all')->select('id')->where(['email LIKE'=>"%".$this->request->getData('email')."%"]);
+                foreach ($users as $user) {
+                    $usersId[] = $user->id;
+                }
+            }
+            if (!empty($this->request->getData('name'))) {
+                $users = $this->Users->find('all')->select('id')->where(
+                    ['OR' => [
+                            'first_name LIKE' => '%'.$this->request->getData('name').'%',
+                            'middle_name LIKE' => '%'.$this->request->getData('name').'%',
+                            'last_name LIKE' => '%'.$this->request->getData('name').'%'
+                        ]
+                    ]
+                );
+                foreach ($users as $user) {
+                    $usersId[] = $user->id;
+                }
+            }
+            $usersId = array_unique($usersId);
+        }
         $this->paginate = [
             'contain' => ['JobTitles', 'Departments']
         ];
-        $employees = $this->paginate($this->Employees);
-        
-        
-        $this->set(compact('employees'));
+        if (!empty($employeeNum) && !empty($usersId)) {
+            $query = $this->Employees->find('all')->where(['employee_num' => $employeeNum, 'user IN' => $usersId]);
+        } elseif (!empty($employeeNum) && empty($usersId)) {
+            $query = $this->Employees->find('all')->where(['employee_num' => $employeeNum]);
+        } elseif (empty($employeeNum) && !empty($usersId)) {
+            $query = $this->Employees->find('all')->where(['user IN' => $usersId]);
+        }
+
+        if (isset($query)) {
+            $this->set('employees', $this->paginate($query));
+        } else {
+            $this->set('employees', $this->paginate($this->Employees));
+        }
     }
 
     /**
@@ -180,7 +218,7 @@ class EmployeesController extends AppController
             'contain' => []
         ]);
 
-        //SAVE EMPLOYEE 
+        //SAVE EMPLOYEE
         if ($this->request->is(['patch', 'post', 'put'])) {
             //LOAD EMPLOYEE ENTITY WITH POST DATA
             $employee = $this->Employees->patchEntity($employee, $this->request->getData());
@@ -208,7 +246,7 @@ class EmployeesController extends AppController
                             //SAVE CUSTOM FIELD VALUE ENTITY
                             $this->CustomFieldValues->save($field);
                         }
-                    } 
+                    }
                     //THERE IS NEW CUSTOM FIELD VALUE ENTITY
                     else {
                         //CREATE NEW CUSTOM FIELD VALUE ENTITY AND LOAD DATA

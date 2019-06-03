@@ -145,4 +145,11 @@ class StatesController extends AppController
         echo json_encode($dataArr);
         exit;
     }
+    public function getStatesForCountry(){
+        if(!empty($this->request->getData('countryId'))){
+            $states = $this->States->find('list')->where(['country_id' => $this->request->getData('countryId')])->toArray();
+            echo json_encode($states);
+        }
+        exit;
+    }
 }

@@ -28,7 +28,7 @@ class ClientContactsController extends AppController
      */
     public function index()
     {
-         if ($this->request->is('post')) {
+        if ($this->request->is('post')) {
             $clientId = '';
             if (!empty($this->request->getData('client_id'))) {
                 $clientId = $this->request->data['client_id'];
@@ -36,7 +36,7 @@ class ClientContactsController extends AppController
             $usersId = [];
             if (!empty($this->request->getData('email'))) {
                 $users = $this->Users->find('all')->select('id')->where(['email LIKE'=>"%".$this->request->getData('email')."%"]);
-                foreach($users as $user){
+                foreach ($users as $user) {
                     $usersId[] = $user->id;
                 }
             }
@@ -46,28 +46,24 @@ class ClientContactsController extends AppController
                     $usersId[] = $user->id;
                 }
             }
-            $usersId = array_unique($usersId);            
+            $usersId = array_unique($usersId);
         }
         $this->paginate = [
             'contain' => ['Clients']
         ];
-        if(!empty($clientId) && !empty($usersId)){
+        if (!empty($clientId) && !empty($usersId)) {
             $query = $this->ClientContacts->find('all')->where(['client_id' => $clientId, 'user_id IN' => $usersId]);
-        }
-        else if(!empty($clientId) && empty($usersId)){
+        } elseif (!empty($clientId) && empty($usersId)) {
             $query = $this->ClientContacts->find('all')->where(['client_id' => $clientId]);
-
-        }
-        else if(empty($clientId) && !empty($usersId)){
+        } elseif (empty($clientId) && !empty($usersId)) {
             $query = $this->ClientContacts->find('all')->where(['user_id IN' => $usersId]);
         }
 
-        if(isset($query)){
+        if (isset($query)) {
             $this->set('clientContacts', $this->paginate($query));
-        }
-        else{
+        } else {
             $this->set('clientContacts', $this->paginate($this->ClientContacts));
-        }        
+        }
         $clients = $this->ClientContacts->Clients->find('list');
         $this->set('clients', $clients);
         $this->set('_serialize', ['clientContacts']);
