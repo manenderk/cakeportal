@@ -82,9 +82,7 @@ class UsersController extends AppController
     {
         //CREATE NEW USER ENTITY
         $user = $this->Users->newEntity();
-        if ($this->request->is('post')) {
-            var_dump($this->request->getData('userGroups'));
-            exit;
+        if ($this->request->is('post')) {            
             //LOAD NEW USER ENTITY WITH POST DATA
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($result = $this->Users->save($user)) {

@@ -75,7 +75,7 @@
                 <?php $user = $this->UserFunctions->getUserDetails($employee->user);?>
                 <tr class="bg-gray-lighter">
                     <td>
-                        <?= $this->Html->link( $user['first_name']." ".$user['middle_name']." ".$user['last_name'], ['controller' => 'Employees', 'action' => 'view', $employee->id]) ?>
+                        <?= $this->Html->link($user['first_name']." ".$user['middle_name']." ".$user['last_name'], ['controller' => 'Employees', 'action' => 'view', $employee->id]) ?>
                     </td>
                     <td>
                         <?= $user['email'] ?>

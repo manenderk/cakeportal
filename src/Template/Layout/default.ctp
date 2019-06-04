@@ -63,6 +63,8 @@
     <?= $this->Html->script('skycons'); ?>
     <?= $this->Html->script('bootstrap-datepicker.min'); ?>
     <?= $this->Html->script('jquery.multi-select'); ?>
+    <?= $this->Html->script('jquery.validate.min'); ?>
+    <?= $this->Html->script('jquery.steps.min'); ?>
     <?= $this->Html->script('custom.js'); ?>
     <?= $this->Html->script('app'); ?>
     <?= $this->Html->script('jquery.gmap.min'); ?>
@@ -543,6 +545,29 @@ if (isset($_GET['keywords']) && $_GET['keywords']!='') {
                                         <span data-localize="sidebar.nav.element.BUTTON">Add Client Manager</span>
                                     </a>
                                 </li>
+                            </ul>
+                        </li>
+                        <li class="animated rollIn">
+                            <a href="#employee" title="Employees" data-toggle="collapse">
+                                <em class="fa fa-magnet -wrench animated"></em>
+                                <span data-localize="sidebar.nav.Employees">Employees</span>
+                            </a>
+                            <ul id="employee" class="nav sidebar-subnav collapse">
+                                <li class="sidebar-subnav-header">Employees</li>
+                                <li>
+                                    <a href="<?=$this->Url->build(["controller" => "Employees","action" => "index"]);?>"
+                                        title="Employees List">
+                                        <em class="fa fa-list"></em>
+                                        <span data-localize="sidebar.nav.element.BUTTON">Employees List</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="<?=$this->Url->build(["controller" => "Employees","action" => "add"]);?>"
+                                        title="Add new Employee">
+                                        <em class="fa fa-plus-circle"></em>
+                                        <span data-localize="sidebar.nav.element.BUTTON">Add new Employee</span>
+                                    </a>
+                                </li>                                
                             </ul>
                         </li>
                         <li>

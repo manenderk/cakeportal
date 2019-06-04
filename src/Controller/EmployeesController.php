@@ -17,7 +17,6 @@ class EmployeesController extends AppController
     private $CustomFields;
     private $CustomFieldValues;
     private $CustomFieldChoices;
-
     public function initialize()
     {
         parent::initialize();
@@ -26,7 +25,6 @@ class EmployeesController extends AppController
         $this->CustomFieldValues = TableRegistry::getTableLocator()->get('CustomFieldValues');
         $this->CustomFieldChoices = TableRegistry::getTableLocator()->get('CustomFieldChoices');
     }
-
     /**
      * Index method
      *
@@ -72,14 +70,12 @@ class EmployeesController extends AppController
         } elseif (empty($employeeNum) && !empty($usersId)) {
             $query = $this->Employees->find('all')->where(['user IN' => $usersId]);
         }
-
         if (isset($query)) {
             $this->set('employees', $this->paginate($query));
         } else {
             $this->set('employees', $this->paginate($this->Employees));
         }
     }
-
     /**
      * View method
      *
@@ -95,7 +91,6 @@ class EmployeesController extends AppController
         
         //GET USER ENTITY FROM USER TABLE
         $user = $this->Users->get($employee['user']);
-
         //VARIABLE TO STORE CUSTOM FIELDS DATA
         $customFieldsData = [];
         
@@ -105,7 +100,6 @@ class EmployeesController extends AppController
         foreach ($customFields as $customField) {
             //VARIABLE TO STORE SINGLE CUSTOM FIELD DATA
             $customFieldData = [];
-
             $customFieldData['name'] = $customField->field_name;
             $customFieldData['value'] = '';
             
@@ -114,7 +108,6 @@ class EmployeesController extends AppController
             foreach ($customFieldValues as $customFieldValue) {
                 $customFieldData['value'] = $customFieldValue->field_value;
             }
-
             //IF THIS CUSTOM FIELD HAS TYPE DROPDOWN
             if ($customField->custom_field_type->field_type == 'Dropdown' && !empty($customFieldData['value'])) {
                 $customFieldChoice = $this->CustomFieldChoices->get($customFieldData['value']);
@@ -125,7 +118,6 @@ class EmployeesController extends AppController
         }
         $this->set(compact('employee', 'user', 'customFieldsData'));
     }
-
     /**
      * Add method
      *
@@ -138,13 +130,11 @@ class EmployeesController extends AppController
         if ($this->request->is('post')) {
             //LOAD EMPLOYEE ENTITY WITH POST DATA
             $employee = $this->Employees->patchEntity($employee, $this->request->getData());
-
             //LOAD CREATED BY
             $employee['created_by'] = $this->Auth->user('id');
             
             //IF THE EMPLOYEE IS SAVED
             if ($result = $this->Employees->save($employee)) {
-
                 //GET CUSTOM FIELDS DATA/VALUE FOR THIS EMPLOYEE
                 $customFieldsData = $this->request->getData('customField');
                 foreach ($customFieldsData as $key => $value) {
@@ -158,7 +148,6 @@ class EmployeesController extends AppController
                     //SAVE CUSTOM FIELD VALUES ENTITY
                     $this->CustomFieldValues->save($customFieldValue);
                 }
-
                 $this->Flash->success(__('The employee has been saved.'));
                 return $this->redirect(['action' => 'index']);
             }
@@ -172,7 +161,6 @@ class EmployeesController extends AppController
         foreach ($customFields as $customField) {
             //VARIABLE TO STORE SINGLE CUSTOM FIELD
             $customFieldEntity = [];
-
             $customFieldEntity['id'] = $customField->id;
             $customFieldEntity['name'] = $customField->field_name;
             
@@ -194,7 +182,6 @@ class EmployeesController extends AppController
         
         //GET ALL USERS FOR USER AND REPORTING MANAGER INPUT FIELD
         $users = $this->Users->find('all')->select(['id', 'first_name', 'middle_name', 'last_name', 'email']);
-
         //GET ALL JOB TITLES FOR JOB TITLE INPUT FIELDS
         $jobTitles = $this->Employees->JobTitles->find('list');
         
@@ -203,7 +190,6 @@ class EmployeesController extends AppController
         
         $this->set(compact('employee', 'jobTitles', 'departments', 'users', 'customFieldsArray'));
     }
-
     /**
      * Edit method
      *
@@ -217,20 +203,15 @@ class EmployeesController extends AppController
         $employee = $this->Employees->get($id, [
             'contain' => []
         ]);
-
         //SAVE EMPLOYEE
         if ($this->request->is(['patch', 'post', 'put'])) {
             //LOAD EMPLOYEE ENTITY WITH POST DATA
             $employee = $this->Employees->patchEntity($employee, $this->request->getData());
-
             //ADD MODIFIED BY
             $employee['modified_by'] = $this->Auth->user('id');
-
             //IF EMPLOYEE IS SAVED
             if ($this->Employees->save($employee)) {
-                //GET CUSTOM FIELDS DATA FOR THIS EMPLOYEE FROM POST DATA
                 $customFieldsData = $this->request->getData('customField');
-
                 //ITERATE THROUGH CUSTOM FIELDS DATA
                 foreach ($customFieldsData as $key => $value) {
                     //FIND CUSTOM FIELD VALUE RECORD FOR THIS EMPLOYEE FOR THIS CUSTOM FIELD
@@ -259,16 +240,14 @@ class EmployeesController extends AppController
                         $this->CustomFieldValues->save($field);
                     }
                 }
-
+                
                 $this->Flash->success(__('The employee has been saved.'));
                 return $this->redirect(['action' => 'index']);
-            }
+            }            
             $this->Flash->error(__('The employee could not be saved. Please, try again.'));
         }
-
         //VARIABLE TO STORE CUSTOM FIELDS FOR EMPLOYEE
         $customFieldsArray = [];
-
         //FIND ALL CUSTOM FIELDS FOR EMPLOYEE
         $customFields=$this->CustomFields->find('all')->where(['table_name' => 'employees'])->contain(['CustomFieldTypes']);
         //ITERATE TROUGH EACH CUSTOM FIELD
@@ -277,7 +256,6 @@ class EmployeesController extends AppController
             $customFieldEntity = [];
             $customFieldEntity['id'] = $customField->id;
             $customFieldEntity['name'] = $customField->field_name;
-
             //GET HTML INPUT TYPE FORM CUSTOM FIELD TYPE
             if ($customField->custom_field_type->field_type == 'String') {
                 $customFieldEntity['type'] = 'text';
@@ -291,7 +269,6 @@ class EmployeesController extends AppController
                     $customFieldEntity['choices'][$choice->id] = $choice->choice_name;
                 }
             }
-
             //VARIABLE TO STORE THIS CUSTOM FIELD VALUE
             $customFieldEntity['value'] = '';
             $customFieldValues = $this->CustomFieldValues->find('all')->where(['record_id' => $employee->id, 'field_id' => $customField->id])->select(['field_value']);
@@ -301,10 +278,8 @@ class EmployeesController extends AppController
             //PUSH SINGLE CUSTOM FIELD ENTITY IN ARRAY
             $customFieldsArray[] = $customFieldEntity;
         }
-
         //GET ALL USERS FOR USER AND REPORTING MANAGER INPUT FIELD
         $users = $this->Users->find('all')->select(['id', 'first_name', 'middle_name', 'last_name', 'email']);
-
         //GET ALL JOB TITLES FOR JOB TITLE INPUT FIELDS
         $jobTitles = $this->Employees->JobTitles->find('list');
         
@@ -313,7 +288,6 @@ class EmployeesController extends AppController
         
         $this->set(compact('employee', 'jobTitles', 'departments', 'users', 'customFieldsArray'));
     }
-
     /**
      * Delete method
      *
@@ -332,7 +306,6 @@ class EmployeesController extends AppController
         } else {
             $this->Flash->error(__('The employee could not be deleted. Please, try again.'));
         }
-
         return $this->redirect(['action' => 'index']);
     }
 }
